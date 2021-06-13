@@ -1,0 +1,38 @@
+{
+  "name": "zhwp-afc-icgbot",
+  "version": "0.1.0",
+  "description": "中文維基百科創建條目專題互聯群機械人",
+  "main": "index.js",
+  "dependencies": {
+    "cron": "^1.8.2",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "es6-shim": "^0.35.6",
+    "eventsource": "^1.1.0",
+    "fs": "^0.0.1-security",
+    "google-it": "^1.6.2",
+    "jquery": "^3.6.0",
+    "jsdom": "^16.6.0",
+    "moment": "^2.29.1",
+    "mwn": "^0.11.0",
+    "nickserv": "^0.4.4",
+    "node-fetch": "^2.6.1",
+    "node-telegram-bot-api": "^0.53.0",
+    "quick.db": "^7.1.3",
+    "wikijs": "^6.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuciferianThomas/zhwp-afc-icgbot.git"
+  },
+  "author": "LuciferianThomas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LuciferianThomas/zhwp-afc-icgbot/issues"
+  },
+  "homepage": "https://github.com/LuciferianThomas/zhwp-afc-icgbot#readme"
+}

@@ -2,6 +2,7 @@ const Discord = require("discord.js")
     , moment = require("moment")
     , db = require("quick.db")
     , EventSource = require('eventsource')
+    , googleit = require('google-it')
 
 const fn = require(process.cwd() + '/util/fn.js')
     , config = require(process.cwd() + '/util/config.js')
@@ -13,18 +14,7 @@ const TGREVGRP = -1001391997174
     , IRCCHN = "#wikipedia-zh-afc-reviewer"
 
 module.exports = async (dcBot, tgBot) => {
-  return;
-  await fn.wait(1000)
-  let page = new fn.mwbot.page("User:LuciferianThomas/AFC測試")
-  // console.log(page)
-  // let creator = await page.getCreator();
-  // let output = `[${ user }](https://zhwp.org/User:${ encodeURI( user ) })`;
-  let text = await page.text();
-  let html = await fn.mwbot.parseWikitext( text, {
-    title: page.title,
-    uselang: "zh-tw"
-  } );
-  console.log(html)
+  
 }
 
 /*

@@ -5,8 +5,8 @@ const Discord = require("discord.js")
     , { mwn } = require("mwn")
     , { JSDOM } = require("jsdom")
 
-const db = require("quick.db"),
-      logs = new db.table("Logs")
+const db = require("quick.db")
+    // , logs = new db.table("Logs")
 
 const { defaultPrefix, embedColor } = require('./config')
 let time = (date = moment()) => {
@@ -51,6 +51,7 @@ const sleep = (ms) => {
 }
 
 const addLog = (logid, msg, {debugchannel, debugonly} = {debugchannel: false, debugonly: false}) => {
+  return;
   if(typeof logid === "object" && !debugchannel) debugchannel = logid.debug
   if(typeof logid === "object") logid = logid.gameID
   if(typeof logid === "number") logid = logid.toString()
