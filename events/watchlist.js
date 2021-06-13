@@ -240,7 +240,7 @@ module.exports = async ( dcBot, tgBot ) => {
         }
         i++;
       }
-      let issueChecker = fn.onSubmit( output, text, {
+      let issueChecker = fn.issueChecker( output, text, {
         links: parseHTML.find( "a" ).length,
         templates,
         countText
@@ -254,7 +254,9 @@ module.exports = async ( dcBot, tgBot ) => {
       return;
     }
 
-    console.log( `${output}${issues && issues.length ? `\n*自動檢測問題*\n${issues.map(x => issuesData[x]).join(" ")}` : ""}` );
+    console.log( `${output}${issues && issues.length
+      ? `\n*自動檢測問題*\n${issues.map(x => issuesData[x]).join(" ")}`
+      : ""}` );
 
     let embed = new DiscordMessageEmbed()
       .setDescription( `**${ output }**` )
@@ -262,7 +264,10 @@ module.exports = async ( dcBot, tgBot ) => {
       embed.addField("自動檢測問題", `• ${issues.map(x => issuesData[x]).join("\n• ")}`)
     dcBot.channels.cache.get( DCREVCHN ).send(embed);
 
-    tgBot.sendMessage( TGREVGRP, `${output}${issues && issues.length ? `\n\n*自動檢測問題*\n• ${issues.map(x => issuesData[x]).join("\n• ")}` : ""}`, {
+    tgBot.sendMessage( TGREVGRP, 
+      `${output}${issues && issues.length 
+        ? `\n\n*自動檢測問題*\n• ${issues.map(x => issuesData[x]).join("\n• ")}` 
+        : ""}`, {
       // eslint-disable-next-line camelcase
       parse_mode: "Markdown",
       // eslint-disable-next-line camelcase

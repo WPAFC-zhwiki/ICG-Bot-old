@@ -137,7 +137,7 @@ const getBacklogInfo = async (mwbot) => {
  * @param {string} wikitext 
  * @param {{links:number,templates:number,countText:string}} data 
  */
-const onSubmit = (output, wikitext, data) => {
+const issueChecker = (output, wikitext, data) => {
   let { links, templates, countText } = data
 
   let issues = []
@@ -238,7 +238,7 @@ module.exports = {
   writeLogs,
   writeLog: writeLogs,
   getBacklogInfo,
-  onSubmit,
+  issueChecker,
 };
 
 (async () => {

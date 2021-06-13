@@ -28,7 +28,6 @@ const fn = require(process.cwd() + "/util/fn.js")
 
 // const logs = new db.table("Logs")
 
-
 const TGREVGRP = -1001391997174
     , DCREVCHN = "852564292393238558"
     , IRCCHN = "#wikipedia-zh-afc-reviewer"
