@@ -14,6 +14,7 @@ module.exports = (dcBot, tgBot) => {
     const prefix = config.defaultPrefix
     
     let shared = {}
+    shared.source = "d"
       
     if (msg.startsWith(prefix)) {
       
@@ -44,7 +45,7 @@ module.exports = (dcBot, tgBot) => {
       // setTimeout(() => message.delete().catch(()=>{}), 60000)
 
       try {
-        await command.runDiscord(dcBot, message, args, shared)
+        await command.run({dcBot, tgBot}, message, args, shared)
       } catch (error) {
         console.error(error)
       }
@@ -58,6 +59,7 @@ module.exports = (dcBot, tgBot) => {
     const prefix = config.defaultPrefix
     
     let shared = {}
+    shared.source = "t"
       
     if (msg.startsWith(prefix)) {
       
@@ -72,7 +74,7 @@ module.exports = (dcBot, tgBot) => {
       // setTimeout(() => message.delete().catch(()=>{}), 60000)
 
       try {
-        await command.runTelegram(tgBot, message, args, shared)
+        await command.run({dcBot, tgBot}, message, args, shared)
       } catch (error) {
         console.error(error)
       }

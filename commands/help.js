@@ -2,11 +2,12 @@ const Discord = require("discord.js"),
       moment = require("moment"),
       db = require("quick.db")
 
-const fn = require(process.cwd() + '/util/fn.js')
+const config = require(process.cwd() + '/util/config.js')
+    , fn = require(process.cwd() + '/util/fn.js')
 
 module.exports = {
   name: "help",
-  runDiscord: async (client, message, args) => {
+  run: async (client, message, args) => {
     if(args[0] === "staff") return
     await message.channel.send(
       new Discord.MessageEmbed()

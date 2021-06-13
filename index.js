@@ -28,7 +28,6 @@ const fn = require(process.cwd() + "/util/fn.js")
 
 // const logs = new db.table("Logs")
 
-module.exports.dcBot = dcBot
 
 const TGREVGRP = -1001391997174
     , DCREVCHN = "852564292393238558"
@@ -37,6 +36,9 @@ const TGREVGRP = -1001391997174
 const tgToken = process.env.TELEGRAM_BOT_TOKEN
 
 const tgBot = new TelegramBot(tgToken, {polling: true, channel_post: true});
+
+module.exports.dcBot = dcBot
+module.exports.tgBot = tgBot
 
 dcBot.once("ready", async () => {
   console.log("Loading commands:")

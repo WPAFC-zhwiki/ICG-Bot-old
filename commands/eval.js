@@ -2,20 +2,20 @@ const Discord = require('discord.js'),
       moment = require('moment'),
       db = require("quick.db")
 
-const config = require(process.cwd() + '/util/config.js'),
-      fn = require(process.cwd() + '/util/fn.js')
+const config = require(process.cwd() + '/util/config.js')
+    , fn = require(process.cwd() + '/util/fn.js')
 
 const TGREVGRP = -1001391997174
     , DCREVCHN = "852564292393238558"
     , IRCCHN = "#wikipedia-zh-afc-reviewer"
 
 module.exports = {
-	name: "eval",
-	usage: "eval <code>",
-	description: "Evaluate JavaScript code!",
+  name: "eval",
+  usage: "eval <code>",
+  description: "Evaluate JavaScript code!",
   // category: "Bot Staff",
   // botStaffOnly: true,
-  runDiscord: async (client, message, args, shared) => {
+  run: async (client, message, args, shared) => {
     if (
       message.author.id !== config.owner
     )
@@ -29,9 +29,9 @@ module.exports = {
       modifier = args.pop()
     }
 
-		try {
-			var out = eval(args.join(' '))
-			out = JSON.stringify(out)
+    try {
+      var out = eval(args.join(' '))
+      out = JSON.stringify(out)
       if (out === undefined) out = "undefined"
       var input = args.join(' ').substring(0, 1024)
       
@@ -56,7 +56,7 @@ module.exports = {
             .setFooter(client.user.username, client.user.avatarURL({ format: 'png', dynamic: true, size: 1024 }))
         ).catch(console.error)
       }
-		} catch (e) {
+    } catch (e) {
       let emsg = `\`\`\`js\n${e.stack.replace(
         /(?:(?!\n.*?\(\/home\/utopium\/wwou.*?)\n.*?\(\/.*?\))+/g,
         "\n\t...")}\`\`\``
@@ -74,7 +74,7 @@ module.exports = {
         )
       message.channel.send(embed).catch(console.error)
       if(emsg.length > 1024) message.channel.send(emsg)
-		}
+    }
     
-	}
+  }
 }
