@@ -26,7 +26,7 @@ const dcBot = new Discord.Client({ intents });
 const fn = require(process.cwd() + "/util/fn.js")
     , config = require(process.cwd() + "/util/config.js")
 
-const logs = new db.table("Logs")
+// const logs = new db.table("Logs")
 
 module.exports.dcBot = dcBot
 
