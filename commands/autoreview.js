@@ -30,96 +30,100 @@ module.exports = {
     } );
     let parseHTML = $( $.parseHTML( html ) ).children();
     let delval = {
-      tag: {
+      tags: [
         // 表格
-        table: true,
-        tbody: true,
-        td: true,
-        tr: true,
-        th: true,
-        // pre: true,
+        'table',
+        'tbody',
+        'td',
+        'tr',
+        'th',
+        'pre',
         // 樣式
-        style: true,
+        'style',
         // 標題常常解析出一堆亂象
-        h1: true,
-        h2: true,
-        h3: true,
-        h4: true,
-        h5: true,
-        h6: true
-      },
-      id: {
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6'
+      ],
+      ids: [
         // 小作品標籤
-        stub: true,
+        'stub',
         // 目錄
-        toc: true
-      },
-      class: {
+        'toc'
+      ],
+      classes: [
         // NoteTA
-        noteTA: true,
+        'noteTA',
         // 表格
-        infobox: true,
-        wikitable: true,
-        navbox: true,
+        'infobox',
+        'wikitable',
+        'navbox',
         // &#60;syntaxhighlight&#62;
-        "mw-highlight": true,
+        'mw-highlight',
         // 圖片說明
-        thumb: true,
+        'thumb',
         // &#60;reference /&#62;
-        reflist: true,
-        reference: true,
+        'reflist',
+        'references',
+        'reference',
         // 不印出來的
-        noprint: true,
+        'noprint',
         // 消歧義
-        hatnote: true,
-        "navigation-not-searchable": true,
+        'hatnote',
+        'navigation-not-searchable',
         // 目錄
-        toc: true
-      }
+        'toc',
+        // edit
+        'mw-editsection'
+      ]
     };
-    let i = 0, ele, countText = "";
-    while ( parseHTML.length > i ) {
-      ele = parseHTML.get( i );
-      if ( !ele.tagName ) {
-        continue;
-      } else if (
-        ele &&
-        delval.tag[ ele.tagName.toString().toLowerCase() ] !== true &&
-        delval.id[ ele.id ] !== true &&
-        // 看不到的
-        ele.style.display !== "none"
-      ) {
-        let t = $( ele ).text();
-        var classes = 0;
-        while ( ele.classList.length > classes ) {
-          if ( delval.class[ ele.classList[ classes ] ] ) {
-            t = "";
-          }
-          classes++;
-        }
-        countText += t;
-      }
-      i++;
-    }
-    let { issues, elements } = fn.issueChecker( text, html, {
-      links: parseHTML.find( "a" ).length,
+
+    let $countHTML = parseHTML.clone();
+
+    $countHTML.find(function () {
+      let selector = '';
+
+      delval.tags.forEach(function (tag) {
+        selector += selector === '' ? tag : `, ${tag}`;
+      });
+
+      delval.ids.forEach(function (id) {
+        selector += `, #${id}`;
+      });
+
+      delval.classes.forEach(function (thisclass) {
+        selector += `, .${thisclass}`;
+      });
+
+      return selector;
+    }()).remove();
+
+    let countText = $countHTML.text().replace(/\n/g, '');
+    let $tds = parseHTML.find('td');
+
+    let { issues, elements } = fn.issueChecker(text, html, {
+      links: parseHTML.find("a").length,
       templates,
-      countText
-    } );
+      countText,
+      $tds
+    });
 
     let dMsg = new Discord.MessageEmbed()
-          .setColor(issues && issues.length ? "RED" : "GREEN")
-          .setTitle("自動審閱系統")
-          .setDescription(
-            `系統剛剛自動審閱了[${title}](https://zhwp.org/${encodeURI( title )
-            })頁面，初步${
-              issues && issues.length
-                ? `發現可能存在以下問題：\n` +
-                  `• ${issues.map(x => issuesData[x]).join("\n• ")}`
-                : `沒有發現顯著的問題。`
-            }`
-          )
-          .setTimestamp()
+      .setColor(issues && issues.length ? "RED" : "GREEN")
+      .setTitle("自動審閱系統")
+      .setDescription(
+        `系統剛剛自動審閱了[${title}](https://zhwp.org/${encodeURI( title )
+        })頁面，初步${
+          issues && issues.length
+            ? `發現可能存在以下問題：\n` +
+              `• ${issues.map(x => issuesData[x]).join("\n• ")}`
+            : `沒有發現顯著的問題。`
+        }`
+      )
+      .setTimestamp()
     let tMsg = "*自動審閱系統*\n" + 
       `系統剛剛自動審閱了[${title}](https://zhwp.org/${encodeURI( title )
       })頁面，初步${

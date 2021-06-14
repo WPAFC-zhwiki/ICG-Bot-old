@@ -202,8 +202,9 @@ module.exports = async ( dcBot, tgBot ) => {
       output += `草稿[${title}](https://zhwp.org/${ encodeURI( title ) })`;
       // console.log("Identified submitter:", new Date())
       let text = await page.text();
+      
       let templates = 0;
-      text.replace( /{{([^{}]+?)}}/, () => {
+      text.replace( /{{([^{}]+?)}}/, function () {
         templates += 1;
       } );
       let html = await fn.mwbot.parseWikitext( text, {
@@ -211,87 +212,88 @@ module.exports = async ( dcBot, tgBot ) => {
         uselang: "zh-tw"
       } );
       let parseHTML = $( $.parseHTML( html ) ).children();
-      // console.log("Obtained page text&wikitext:", new Date())
       let delval = {
-        tag: {
+        tags: [
           // 表格
-          table: true,
-          tbody: true,
-          td: true,
-          tr: true,
-          th: true,
-          // pre: true,
+          'table',
+          'tbody',
+          'td',
+          'tr',
+          'th',
+          'pre',
           // 樣式
-          style: true,
+          'style',
           // 標題常常解析出一堆亂象
-          h1: true,
-          h2: true,
-          h3: true,
-          h4: true,
-          h5: true,
-          h6: true
-        },
-        id: {
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6'
+        ],
+        ids: [
           // 小作品標籤
-          stub: true,
+          'stub',
           // 目錄
-          toc: true
-        },
-        class: {
+          'toc'
+        ],
+        classes: [
           // NoteTA
-          noteTA: true,
+          'noteTA',
           // 表格
-          infobox: true,
-          wikitable: true,
-          navbox: true,
+          'infobox',
+          'wikitable',
+          'navbox',
           // &#60;syntaxhighlight&#62;
-          "mw-highlight": true,
+          'mw-highlight',
           // 圖片說明
-          thumb: true,
+          'thumb',
           // &#60;reference /&#62;
-          reflist: true,
-          reference: true,
+          'reflist',
+          'references',
+          'reference',
           // 不印出來的
-          noprint: true,
+          'noprint',
           // 消歧義
-          hatnote: true,
-          "navigation-not-searchable": true,
+          'hatnote',
+          'navigation-not-searchable',
           // 目錄
-          toc: true
-        }
+          'toc',
+          // edit
+          'mw-editsection'
+        ]
       };
-      let i = 0, ele, countText = "";
-      while ( parseHTML.length > i ) {
-        ele = parseHTML.get( i );
-        if ( !ele.tagName ) {
-          continue;
-        } else if (
-          ele &&
-          delval.tag[ ele.tagName.toString().toLowerCase() ] !== true &&
-          delval.id[ ele.id ] !== true &&
-          // 看不到的
-          ele.style.display !== "none"
-        ) {
-          let t = $( ele ).text();
-          var classes = 0;
-          while ( ele.classList.length > classes ) {
-            if ( delval.class[ ele.classList[ classes ] ] ) {
-              t = "";
-            }
-            classes++;
-          }
-          countText += t;
-        }
-        i++;
-      }
-      // console.log("Done handling wikitext for issue checking:", new Date())
-      let issueChecker = await fn.issueChecker( text, html, {
-        links: parseHTML.find( "a" ).length,
+
+      let $countHTML = parseHTML.clone();
+
+      $countHTML.find(function () {
+        let selector = '';
+
+        delval.tags.forEach(function (tag) {
+          selector += selector === '' ? tag : `, ${tag}`;
+        });
+
+        delval.ids.forEach(function (id) {
+          selector += `, #${id}`;
+        });
+
+        delval.classes.forEach(function (thisclass) {
+          selector += `, .${thisclass}`;
+        });
+
+        return selector;
+      }()).remove();
+
+      let countText = $countHTML.text().replace(/\n/g, '');
+      let $tds = parseHTML.find('td');
+
+      let issueChecker = fn.issueChecker(text, html, {
+        links: parseHTML.find("a").length,
         templates,
-        countText
-      } );
-      let elements = issueChecker.elements
-      issues = issueChecker.issues
+        countText,
+        $tds
+      });
+      isses = issueChecker.issues
       // console.log("Done issue checking:", new Date())
       // output += "\n\n*可能存在的問題*" + issues.join(" ")
     }

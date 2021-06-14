@@ -206,8 +206,8 @@ const issueChecker = (wikitext, html, data) => {
   if (emCnt > (wikitext.match(/==(?:.*?)==/g) || []).length -1)
     issues.push("over-emphasize")
   
-  let mainText = $($.parseHTML( html )).children()
-  // console.log(mainText.find("table > * > td"))
+  // let mainText = html.find("p").text()
+  // console.log(mainText)
   
   if (/^[ 　]+(?!$\n)/.test(wikitext))
     issues.push("bad-indents")
