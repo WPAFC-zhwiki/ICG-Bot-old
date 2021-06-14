@@ -30,81 +30,85 @@ module.exports = {
     } );
     let parseHTML = $( $.parseHTML( html ) ).children();
     let delval = {
-      tag: {
-        // 表格
-        table: true,
-        tbody: true,
-        td: true,
-        tr: true,
-        th: true,
-        // pre: true,
-        // 樣式
-        style: true,
-        // 標題常常解析出一堆亂象
-        h1: true,
-        h2: true,
-        h3: true,
-        h4: true,
-        h5: true,
-        h6: true
-      },
-      id: {
-        // 小作品標籤
-        stub: true,
-        // 目錄
-        toc: true
-      },
-      class: {
-        // NoteTA
-        noteTA: true,
-        // 表格
-        infobox: true,
-        wikitable: true,
-        navbox: true,
-        // &#60;syntaxhighlight&#62;
-        "mw-highlight": true,
-        // 圖片說明
-        thumb: true,
-        // &#60;reference /&#62;
-        reflist: true,
-        reference: true,
-        // 不印出來的
-        noprint: true,
-        // 消歧義
-        hatnote: true,
-        "navigation-not-searchable": true,
-        // 目錄
-        toc: true
-      }
-    };
-    let i = 0, ele, countText = "";
-    while ( parseHTML.length > i ) {
-      ele = parseHTML.get( i );
-      if ( !ele.tagName ) {
-        continue;
-      } else if (
-        ele &&
-        delval.tag[ ele.tagName.toString().toLowerCase() ] !== true &&
-        delval.id[ ele.id ] !== true &&
-        // 看不到的
-        ele.style.display !== "none"
-      ) {
-        let t = $( ele ).text();
-        var classes = 0;
-        while ( ele.classList.length > classes ) {
-          if ( delval.class[ ele.classList[ classes ] ] ) {
-            t = "";
-          }
-          classes++;
-        }
-        countText += t;
-      }
-      i++;
-    }
+		tags: [
+			// 表格
+			'table',
+			'tbody',
+			'td',
+			'tr',
+			'th',
+			'pre',
+			// 樣式
+			'style',
+			// 標題常常解析出一堆亂象
+			'h1',
+			'h2',
+			'h3',
+			'h4',
+			'h5',
+			'h6'
+		],
+		ids: [
+			// 小作品標籤
+			'stub',
+			// 目錄
+			'toc'
+		],
+		classes: [
+			// NoteTA
+			'noteTA',
+			// 表格
+			'infobox',
+			'wikitable',
+			'navbox',
+			// &#60;syntaxhighlight&#62;
+			'mw-highlight',
+			// 圖片說明
+			'thumb',
+			// &#60;reference /&#62;
+			'reflist',
+			'references',
+			'reference',
+			// 不印出來的
+			'noprint',
+			// 消歧義
+			'hatnote',
+			'navigation-not-searchable',
+			// 目錄
+			'toc',
+			// edit
+			'mw-editsection'
+		]
+	};
+
+	let $countHTML = $parseHTML.clone();
+
+	$countHTML.find( function () {
+    let selector = '';
+
+	  delval.tags.forEach( function ( tag ) {
+	    selector += selector === '' ? tag : `, ${ tag }`;
+	  } );
+
+	  delval.ids.forEach( function ( id ) {
+	    selector += `, #${ id }`;
+	  } );
+
+	  delval.classes.forEach( function ( thisclass ) {
+	    selector += `, .${ thisclass }`;
+	  } );
+
+	  return selector;
+	}() ).remove();
+      
+    let countText = $countHTML.text().replace( /\n/g, '' );
+    let $tds = $parseHTML.find( 'td' );
+ 
     let { issues, elements } = fn.issueChecker( text, html, {
-      links: parseHTML.find( "a" ).length,
+      links: $parseHTML.find( "a" ).length,
       templates,
-      countText
+      countText,
+      $tds
     } );
 
     let dMsg = new Discord.MessageEmbed()
