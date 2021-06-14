@@ -32,21 +32,12 @@ module.exports = {
     let delval = {
       tags: [
         // 表格
-        'table',
-        'tbody',
-        'td',
-        'tr',
-        'th',
+        'table', 'tbody', 'td', 'tr', 'th',
         'pre',
         // 樣式
         'style',
         // 標題常常解析出一堆亂象
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6'
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
       ],
       ids: [
         // 小作品標籤
