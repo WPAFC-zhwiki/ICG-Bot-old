@@ -11,15 +11,33 @@ const fn = require( process.cwd() + "/util/fn.js" )
     , issuesData = require( process.cwd() + "/util/issues.js" )
 
 const getReason = ($e = $("<div>")) => {
+  // console.log("Start ident a reason:", new Date())
   if ($e.find("table").length) {
     $e.find(".hide-when-compact, .date-container").remove()
   }
+  console.log($e.find(".mbox-image a"))
+  if ($e.find(".mbox-image a").length) {
+    $e.find(".mbox-image a").remove()
+  }
   let text = $e.text().trim()
-  if ($e.find("a")) {
-    $e.find("a").each(function (_i, ele) {
+  let li = $e.find("li")
+    , hr = $e.find("hr")
+    , a = $e.find("a")
+  if (li) {
+    li.each((_i, ele) => {
+      let eleText = $(ele).text()
       text = text.replace(
-        $(ele).text(),
-        `[${$(ele).text()}](${ele.href.replace(/^\/w/, "https://zhwp.org/w")} )`
+        eleText,
+        `${eleText}\r• `
+      )
+    })
+  }
+  if (a) {
+    a.each((_i, ele) => {
+      let eleText = $(ele).text()
+      text = text.replace(
+        eleText,
+        `[${eleText}](${ele.href.replace(/^\/w/, "https://zhwp.org/w")} )`
       )
     })
   }
@@ -28,8 +46,8 @@ const getReason = ($e = $("<div>")) => {
   if (text === "。") {
     return ""
   }
-
-  return text.replace(/此條目/g, "草稿").replace(/\n/g, "")
+  // console.log("Done identing reason:", new Date())
+  return text.replace(/此條目/g, "草稿").replace(/\n/g, "").replace(/\r/g,"\n").replace(/\n• (?:$|\n)/g,"")
 }
 
 /**
@@ -46,8 +64,7 @@ module.exports = async ( dcBot, tgBot ) => {
     ) {
       return;
     }
-
-    console.log( data.user, data.comment );
+    // console.log("Received event:", new Date())
 
     let status =
       data.comment.match( /^\[\[([^[\]]+)\]\]已添加至分类/ ) && "add" ||
@@ -58,12 +75,12 @@ module.exports = async ( dcBot, tgBot ) => {
     if ( !status ) {
       return;
     }
+    // console.log("Identified status:", new Date())
 
     console.log( `status: ${ status }` );
 
     const title = data.comment.replace( /^\[\[:?([^[\]]+)\]\].*$/, "$1" );
 
-    // if (status == "removed") return; // 稍後處理
     let { user } = data;
 
     let page = new fn.mwbot.page( title );
@@ -71,16 +88,24 @@ module.exports = async ( dcBot, tgBot ) => {
     let creator = await page.getCreator();
     await page.purge();
     let output = `[${ user }](https://zhwp.org/User:${ encodeURI( user ) })`;
-    let issues = []
+
+    let reasonL = []
+      , issues = []
+      , mode = ""
+
+    // console.log("Obtained page information:", new Date())
     if ( status === "remove" ) {
       let text = await page.text();
       let html = await fn.mwbot.parseWikitext( text, {
         title: title,
         uselang: "zh-tw"
       } );
+      // console.log("Obtained page text & wikitext for remove template edit:", new Date())
       let parseHTML = $( $.parseHTML( html ) );
       let $submissionbox = parseHTML.find( ".afc-submission" ).first();
       if ( !$submissionbox.length && page.namespace === 0 ) {
+        mode = "accept"
+        // console.log("Identified as accept:", new Date())
         output += `已接受[${ creator }](https://zhwp.org/User:${ encodeURI( creator ) })的草稿[${title}](https://zhwp.org/${ encodeURI( title ) })`;
         let tpClass;
         try {
@@ -110,12 +135,22 @@ module.exports = async ( dcBot, tgBot ) => {
         if ( cClass.length > 0 ) {
           output += `（${ cClass }級）`;
         }
-      } else if ( !$submissionbox.length && page.namespace !== 0 ) {
+        // console.log("Identified accept class:", new Date())
+      } 
+      else if ( !$submissionbox.length && page.namespace !== 0 ) {
+        mode = "remove"
+        // console.log("Identified as template removal:", new Date())
         output += `移除了[${ creator }](https://zhwp.org/User:${ encodeURI( creator ) })的草稿[${ title }](https://zhwp.org/${ encodeURI( title ) })的AFC模板。`;
-      } else if ( $submissionbox.hasClass( "afc-submission-pending" ) ) {
+      } 
+      else if ( $submissionbox.hasClass( "afc-submission-pending" ) ) {
         console.log( "Bug: The page has {{Afc submission/pending}} is removed from category \"Category:正在等待審核的草稿\"? hm......" );
         return;
-      } else if ( $submissionbox.hasClass( "afc-submission-declined" ) || $submissionbox.hasClass( "afc-submission-rejected" ) ) {
+      } 
+      else if ( 
+        $submissionbox.hasClass( "afc-submission-declined" ) || 
+        $submissionbox.hasClass( "afc-submission-rejected" ) 
+      ) {
+        // console.log("Identified as reject/decline:", new Date())
         output += "將";
         if ( text.match( /\|u=([^|]+)\|/ ) ) {
           let submituser = text.match( /\|u=([^|]+)\|/ )[ 1 ];
@@ -123,16 +158,19 @@ module.exports = async ( dcBot, tgBot ) => {
         } else {
           output += `建立者[${ creator }](https://zhwp.org/User:${ encodeURI( creator ) })的`;
         }
+        // console.log("Identified submitter/creator:", new Date())
         output += `草稿[${ title }](https://zhwp.org/${ encodeURI( title ) })標記為`;
         if ( $submissionbox.hasClass( "afc-submission-rejected" ) ) {
           output += "拒絕再次提交的草稿";
+          mode = "reject"
         } else {
           output += "仍需改善的草稿";
+          mode = "decline"
         }
-        let reason = "，未提供理由。",
-          $reasonbox = $submissionbox.find( ".afc-submission-reason-box" );
+        // console.log("Marked as rejected/declined:", new Date())
+        let $reasonbox = $submissionbox.find( ".afc-submission-reason-box" );
         if ( $reasonbox.children().length ) {
-          reason = "，理由：";
+          // console.log("Start of reason module:", new Date())
           let reasons = [];
           $reasonbox.children().each( function ( _i, $e ) {
             if ( $( $e ).children().length > 1 && $( $e ).children() === $( $e ).children( "table, hr" ).length ) {
@@ -147,17 +185,22 @@ module.exports = async ( dcBot, tgBot ) => {
             }
           } );
           reasons.forEach( function ( v, i ) {
-            reason += `\n*${ i + 1 }*：${ v.trim() }`;
+            reasonL.push(`• ${ v.trim() }`);
           } );
+          // console.log("End of reason module:", new Date())
         }
-        output += reason;
+        // output += reason;
+        // console.log(`Obtained reason`, new Date(),`\n${reason}`)
       }
     } else if ( status === "add" ) {
+      // console.log("Identified as submission:", new Date())
+      mode = "submit"
       output += "提交了";
       if ( creator !== user ) {
         output += `[${ creator }](https://zhwp.org/User:${ encodeURI( creator ) })創建的`;
       }
       output += `草稿[${title}](https://zhwp.org/${ encodeURI( title ) })`;
+      // console.log("Identified submitter:", new Date())
       let text = await page.text();
       let templates = 0;
       text.replace( /{{([^{}]+?)}}/, () => {
@@ -168,6 +211,7 @@ module.exports = async ( dcBot, tgBot ) => {
         uselang: "zh-tw"
       } );
       let parseHTML = $( $.parseHTML( html ) ).children();
+      // console.log("Obtained page text&wikitext:", new Date())
       let delval = {
         tag: {
           // 表格
@@ -240,6 +284,7 @@ module.exports = async ( dcBot, tgBot ) => {
         }
         i++;
       }
+      // console.log("Done handling wikitext for issue checking:", new Date())
       let issueChecker = await fn.issueChecker( text, html, {
         links: parseHTML.find( "a" ).length,
         templates,
@@ -247,6 +292,7 @@ module.exports = async ( dcBot, tgBot ) => {
       } );
       let elements = issueChecker.elements
       issues = issueChecker.issues
+      // console.log("Done issue checking:", new Date())
       // output += "\n\n*可能存在的問題*" + issues.join(" ")
     }
 
@@ -254,24 +300,34 @@ module.exports = async ( dcBot, tgBot ) => {
       return;
     }
 
-    console.log( `${output}${issues && issues.length
-      ? `\n*自動檢測問題*\n${issues.map(x => issuesData[x]).join(" ")}`
-      : ""}` );
+    // console.log( `${output}${issues && issues.length
+    //   ? `\n*自動檢測問題*\n${issues.map(x => issuesData[x]).join(" ")}`
+    //   : ""}` );
 
     let embed = new DiscordMessageEmbed()
       .setDescription( `**${ output }**` )
+    if (mode == "reject" || mode == "decline")
+      embed.addField("拒絕理由：", reasonL.length ? reasonL.join("\n") : "無")
     if (issues && issues.length)
       embed.addField("自動檢測問題", `• ${issues.map(x => issuesData[x]).join("\n• ")}`)
     dcBot.channels.cache.get( DCREVCHN ).send(embed);
 
-    tgBot.sendMessage( TGREVGRP, 
-      `${output}${issues && issues.length 
-        ? `\n\n*自動檢測問題*\n• ${issues.map(x => issuesData[x]).join("\n• ")}` 
-        : ""}`, {
+    let tMsg = output
+    if (mode == "reject" || mode == "decline") {
+      if (reasonL.length) tMsg += `，理由如下：\n${reasonL.join("\n")}`
+      else tMsg += "，未提供理由。"
+    }
+    if (issues && issues.length) tMsg += `\n\n*自動檢測問題*\n• ${issues.map(x => issuesData[x]).join("\n• ")}`
+    console.log(tMsg)
+    tMsg = tMsg.replace(/_/g, "\\_")
+
+    tgBot.sendMessage( TGREVGRP, tMsg, {
       // eslint-disable-next-line camelcase
       parse_mode: "Markdown",
       // eslint-disable-next-line camelcase
       disable_web_page_preview: true
     } );
+    
+    // console.log("Done with everything:", new Date())
   };
 };
