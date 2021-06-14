@@ -30,9 +30,7 @@ tgBot.telegram.getMe().then( function ( me ) {
 	return null;
 } );
 
-tgBot.launch().then( function () {
-	console.log( '\x1b[32m[S] [Telegram]\x1b[0m launch......' );
-} ).catch( function ( e ) {
+tgBot.launch().catch( function ( e ) {
 	console.log( '\x1b[31m[E] [Telegram]\x1b[0m Error:', e );
 } );
 

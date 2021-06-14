@@ -46,7 +46,7 @@ dcBot.once( 'ready', async () => {
 		}
 
 		if ( /ping/i.test( msg.text ) ) {
-			tgBot.sendMessage( chatId, 'Pong!' );
+			tgBot.telegram.sendMessage( chatId, 'Pong!' );
 		}
 		let fwdchan;
 		if ( msg.chat.id === TGREVGRP ) {
@@ -55,32 +55,9 @@ dcBot.once( 'ready', async () => {
 		if ( !fwdchan ) {
 			return;
 		}
-
-		if ( /^\(NOFWD\)/.test( msg.text ) ) {
-			return;
-		}
-		if ( links.length ) {
-			tgBot.sendMessage( chatId, links.join( '\n' ) );
-		}
-		dcBot.channels.cache.get( fwdchan ).send(
-			`[T - ${ msg.from.username }] ${ msg.text || ( msg.sticker ? `[Sticker] ${ msg.sticker.emoji }` : msg.photo ? '[IMAGE]' : msg.document ? '[DOCUMENT]' : msg.audio ? '[AUDIO]' : msg.video ? '[VIDEO]' : '' ) }${ links.length ? '\n' + links.join( '\n' ) : '' }`
-		);
-
-		// ircclient.say(IRCCHN,
-		//   `[T - ${msg.from.username}] ${msg.text || (msg.sticker ? `[Sticker] ${msg.sticker.emoji}` : msg.photo ? `[IMAGE]` : msg.document ? `[DOCUMENT]` : msg.audio ? `[AUDIO]` : msg.video ? `[VIDEO]` : "")}${links.length ? "\n" + links.join("\n") : ''}`
-		// );
 	} );
 
 	tgBot.on( 'polling_error', console.log );
-} );
-
-const token = process.env.DISCORD_BOT_TOKEN;
-// , tokenT = process.env.TELEGRAM_BOT_TOKEN
-
-/* --- ALL GLOBAL CONSTANTS & FUNCTIONS --- */
-
-dcBot.login( token ).then( () => {
-	console.log( 'AFC helper bot has logged in.' );
 } );
 
 dcBot.once( 'ready', async () => {
@@ -115,17 +92,6 @@ dcBot.on( 'message', async ( message ) => {
 		}
 	}
 
-	let fwdchan;
-	if ( message.channel.id === DCREVCHN ) {
-		fwdchan = TGREVGRP;
-	}
-	if ( !fwdchan ) {
-		return;
-	}
-
-	tgBot.sendMessage( fwdchan, `[D - ${ message.author.tag }] ${ message.content }${
-		links.length ? '\n' + links.join( '\n' ) : ''
-	}` );
 	// await fn.wait(500)
 	// tgBot.sendMessage(fwdchan, )
 } );
@@ -141,3 +107,5 @@ dcBot.on( 'message', async ( message ) => {
 //     )
 //   }
 // }, 120000) //2 minutes
+
+require( './modules/LilyWhiteBot/main.js' );
