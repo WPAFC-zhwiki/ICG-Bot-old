@@ -160,7 +160,7 @@ module.exports = async ( dcBot, tgBot ) => {
       output += `草稿[${title}](https://zhwp.org/${ encodeURI( title ) })`;
       let text = await page.text();
       let templates = 0;
-      text.replace( /{{([^{}]+?)}}/, function () {
+      text.replace( /{{([^{}]+?)}}/, () => {
         templates += 1;
       } );
       let html = await fn.mwbot.parseWikitext( text, {
@@ -240,7 +240,7 @@ module.exports = async ( dcBot, tgBot ) => {
         }
         i++;
       }
-      let issueChecker = fn.issueChecker( text, html, {
+      let issueChecker = await fn.issueChecker( text, html, {
         links: parseHTML.find( "a" ).length,
         templates,
         countText
