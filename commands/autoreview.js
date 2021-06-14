@@ -101,7 +101,7 @@ module.exports = {
       }
       i++;
     }
-    let { issues, elements } = fn.issueChecker( "", text, {
+    let { issues, elements } = fn.issueChecker( text, html, {
       links: parseHTML.find( "a" ).length,
       templates,
       countText

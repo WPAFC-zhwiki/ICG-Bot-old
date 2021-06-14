@@ -4,6 +4,9 @@ const Discord = require("discord.js")
     , wiki = require('wikijs').default
     , { mwn } = require("mwn")
     , { JSDOM } = require("jsdom")
+    , googleIt = require('google-it')
+    , { fuzzy } = require('fast-fuzzy')
+    , $ = require( "jquery" )( new ( require( "jsdom" ).JSDOM )().window )
 
 const db = require("quick.db")
     // , logs = new db.table("Logs")
@@ -131,13 +134,7 @@ const getBacklogInfo = async (mwbot) => {
   }
 }
 
-/**
- * 
- * @param {string} output 
- * @param {string} wikitext 
- * @param {{links:number,templates:number,countText:string}} data 
- */
-const issueChecker = (output, wikitext, data) => {
+const issueChecker = (wikitext, html, data) => {
   let { links, templates, countText } = data
 
   let issues = []
@@ -206,8 +203,11 @@ const issueChecker = (output, wikitext, data) => {
   let em = wikitext.replace(/<ref.*?<\/ref>/gi,"").match(/(?:''|<(?:em|i|b)>|\{\{big|【)(?:.*?)(?:''|<\/(?:em|i|b)>|】)/g)
   // console.log(em)
   let emCnt = (em || []).length
-  if (emCnt > (wikitext.match(/==(?:.*?)==/g) || []).length)
+  if (emCnt > (wikitext.match(/==(?:.*?)==/g) || []).length -1)
     issues.push("over-emphasize")
+  
+  let mainText = $($.parseHTML( html )).children()
+  // console.log(mainText.find("table > * > td"))
   
   if (/^[ 　]+(?!$\n)/.test(wikitext))
     issues.push("bad-indents")
@@ -216,6 +216,20 @@ const issueChecker = (output, wikitext, data) => {
     issues,
     elements
   }
+}
+
+const findCopyvio = async (qString) => {
+  let gResults = await googleIt({
+    query: `"${qString}" -site:*.wikipedia.org`,
+    disableConsole: true
+  })
+  let matchScore = 0
+  for (r of gResults) {
+    let s = fuzzy(queryString, r.snippet) * 100
+    if (s > matchScore) matchScore = s
+    // if (s == 100)
+  }
+  return matchScore
 }
 
 module.exports = {
@@ -239,6 +253,7 @@ module.exports = {
   writeLog: writeLogs,
   getBacklogInfo,
   issueChecker,
+  findCopyvio,
 };
 
 (async () => {

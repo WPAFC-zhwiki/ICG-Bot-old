@@ -240,7 +240,7 @@ module.exports = async ( dcBot, tgBot ) => {
         }
         i++;
       }
-      let issueChecker = fn.issueChecker( output, text, {
+      let issueChecker = fn.issueChecker( text, html, {
         links: parseHTML.find( "a" ).length,
         templates,
         countText
