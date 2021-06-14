@@ -9,7 +9,7 @@ module.exports = async function () {
 	const cnt = list.length;
 	const html = await mwbot.parseTitle( 'Template:AFC_status/level' );
 	const $rawLvl = $( $.parseHTML( html ) );
-	const lvl = parseInt( $rawLvl.find( '.mw-parser-output > p' ).text(), 10 );
+	const lvl = parseInt( $rawLvl.find( 'p' ).text(), 10 );
 
 	const dMsg = new DiscordMessageEmbed()
 		.setColor( function () {
