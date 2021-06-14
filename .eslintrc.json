@@ -1,0 +1,78 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"wikimedia",
+		"wikimedia/node",
+		"wikimedia/language/es2019",
+		"wikimedia/jquery"
+	],
+	"globals": {
+		"$": "off"
+	},
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": 12
+	},
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"rules": {
+		"no-console": "off",
+		"vars-on-top": "off",
+		"one-var": "off",
+		"max-len": [ "warn", {
+			"code": 120,
+			"tabWidth": 4,
+			"ignorePattern": "^// eslint-.+",
+			"ignoreUrls": true,
+			"ignoreComments": false,
+			"ignoreRegExpLiterals": true,
+			"ignoreStrings": true,
+			"ignoreTemplateLiterals": true
+		} ],
+		"strict": [ "error", "never" ],
+		"no-use-before-define": [ "off", {
+			"functions": false,
+			"classes": false,
+			"variables": false
+		} ],
+		"no-unused-vars": [ "error", {
+			"vars": "all",
+			"args": "after-used",
+			"ignoreRestSiblings": false,
+			"argsIgnorePattern": "^_"
+		} ],
+		"new-cap": [ "error", {
+			"newIsCapExceptions": [
+				"mwn"
+			],
+			"newIsCapExceptionPattern": "^mwn\\..|^mw[Bb]ot\\.."
+		} ],
+		"prefer-const": "off",
+		"template-curly-spacing": [ "error", "always" ]
+	},
+	"settings": {
+		"jsdoc": {
+			"preferredTypes": [
+				"JQuery"
+			],
+			"mode": "typescript"
+		}
+	},
+	"overrides": [
+		{
+			"files": [
+				"src/*.ts",
+				"src/**/*.ts"
+			],
+			"extends": [
+				"plugin:@typescript-eslint/recommended"
+			],
+			"rules": {}
+		}
+	]
+}
