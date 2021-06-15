@@ -1,17 +1,15 @@
-const Discord = require("discord.js")
-    , moment = require("moment")
-    , fs = require("fs")
-    , wiki = require('wikijs').default
-    , { mwn } = require("mwn")
-    , { JSDOM } = require("jsdom")
-    , googleIt = require('google-it')
-    , { fuzzy } = require('fast-fuzzy')
-    , $ = require( "jquery" )( new ( require( "jsdom" ).JSDOM )().window )
+/* eslint-disable no-unreachable */
+const Discord = require( 'discord.js' )
+	  , moment = require( 'moment' )
+	  , fs = require( 'fs' )
+	  , { mwn } = require( 'mwn' )
+	  , { JSDOM } = require( 'jsdom' );
 
-const db = require("quick.db")
-    // , logs = new db.table("Logs")
+const db = require( 'quick.db' );
+// , logs = new db.table("Logs")
 
 const { defaultPrefix, embedColor } = require('./config')
+
 let time = (date = moment()) => {
   return moment(date).utcOffset(8).format("YYYY/MM/DD HH:mm:ss")
 }
@@ -134,104 +132,6 @@ const getBacklogInfo = async (mwbot) => {
   }
 }
 
-const issueChecker = (wikitext, html, data) => {
-  let { links, templates, countText } = data
-
-  let issues = []
-  let elements = {}
-  elements.intLinks = wikitext.match(/\[\[.*?\]\]/g)
-  let refs = (wikitext.match(/<ref.*?>.*?<\/ref>/gi) || []).map((x, i) => [i, x])
-  elements.refs = {
-    all: refs,
-    default: refs.filter(([i, x]) => 
-      !(/group=/i.test(x))
-    ),
-    references: refs.filter(([i, x]) => 
-      !(/group=/i.test(x)) && (
-        /https?:\/\/[^\s]*/.test(x) ||
-        /ISBN (?:(?:\d-?){10}|(?:\d-?){13})/.test(x) ||
-        /PMID \d+/.test(x) ||
-        /RFC \d+/.test(x) ||
-        /\{\{cit(?:e|ation).*?\}\}/.test(x)
-      )
-    ),
-    disallowed: refs.filter(([i, x]) => 
-      !(/group=/i.test(x)) && (
-        /baike.baidu.com|百度|quora.com|toutiao.com|pincong.rocks|zhihu.com|知乎/.test(x)
-      )
-    ),
-    unreliable: refs.filter(([i, x]) => 
-      !(/group=/i.test(x)) && (
-        /百家[号號]|baijiahao.baidu.com|bigexam.hk|boxun.com|bowenpress.com|hkgpao.com|peopo.org|qyer.com|speakout.hk|songshuhui.net|youtube.com|youtu.be|acfun.cn|bilibili.com/.test(x)
-      )
-    )
-  }
-  // console.log(elements.refs)
-  elements.cats = wikitext.match(/\[\[:?(?:Category|分[类類]):/gi) || []
-
-  // if ()
-  let contentLen = countText.length - countText.match(/\p{L}/i) * 0.5
-  if (contentLen <= 50)
-    issues.push("substub")
-  else if (contentLen <= 220)
-    issues.push("stub")
-  else if (contentLen >= 15000)
-    issues.push("lengthy")
-
-  if (!/\[\[|\{\{|\{\||==|<ref|''|<code|<pre|<source|\[http|\|-|\|}|^[*#]/.test(wikitext))
-    issues.push("wikify")
-  
-  if (elements.refs.references.length == 0 && elements.refs.all.length == 0)
-    issues.push("unreferenced")
-  else {
-    if (elements.refs.references.length < contentLen / 200)
-      issues.push("ref-improve")
-    if (elements.refs.disallowed.length)
-      issues.push("ref-disallowed")
-    if (elements.refs.unreliable.length)
-      issues.push("ref-unreliable")
-  }
-  
-  if (
-    elements.refs.unreliable.length + elements.refs.disallowed.length >=
-    elements.refs.references.length * 0.5
-  ) issues.push("need-rs")
-  
-  if (elements.cats.length == 0)
-    issues.push("uncategorized")
-
-  let em = wikitext.replace(/<ref.*?<\/ref>/gi,"").match(/(?:''|<(?:em|i|b)>|\{\{big|【)(?:.*?)(?:''|<\/(?:em|i|b)>|】)/g)
-  // console.log(em)
-  let emCnt = (em || []).length
-  if (emCnt > (wikitext.match(/==(?:.*?)==/g) || []).length -1)
-    issues.push("over-emphasize")
-  
-  // let mainText = html.find("p").text()
-  // console.log(mainText)
-  
-  if (/^[ 　]+(?!$\n)/.test(wikitext))
-    issues.push("bad-indents")
-  
-  return {
-    issues,
-    elements
-  }
-}
-
-const findCopyvio = async (qString) => {
-  let gResults = await googleIt({
-    query: `"${qString}" -site:*.wikipedia.org`,
-    disableConsole: true
-  })
-  let matchScore = 0
-  for (r of gResults) {
-    let s = fuzzy(queryString, r.snippet) * 100
-    if (s > matchScore) matchScore = s
-    // if (s == 100)
-  }
-  return matchScore
-}
-
 module.exports = {
   time,
   utcTime,
@@ -252,19 +152,21 @@ module.exports = {
   writeLogs,
   writeLog: writeLogs,
   getBacklogInfo,
-  issueChecker,
-  findCopyvio,
 };
 
 (async () => {
-  const mwbot = await mwn.init({
-    apiUrl: 'https://zh.wikipedia.org/w/api.php',
-    username: "LuciferianBot@AFCHBot2.0",
-    password: process.env.WIKIBOTPW,
-    userAgent: 'ZHAFC/2.0 (//zhwp.org/User:LuciferianThomas)',
-    defaultParams: {
-      assert: 'user'
-    }
-  })
-  module.exports.mwbot = mwbot
+	let optin = require( './credentials.json' );
+	Object.assign( optin.mwn, {
+		apiUrl: 'https://zh.wikipedia.org/w/api.php',
+		defaultParams: {
+			assert: 'user'
+		}
+	} );
+	const mwbot = new mwn( optin.mwn );
+	if ( optin.mwn.OAuthCredentials ) {
+		mwbot.getTokensAndSiteInfo();
+	} else {
+		mwbot.login();
+	}
+	module.exports.mwbot = mwbot;
 })()
