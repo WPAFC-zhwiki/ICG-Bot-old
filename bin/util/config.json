@@ -2,5 +2,21 @@
 	"embedColor": "0x708ad7",
 	"TGREVGRP": -1001391997174,
 	"DCREVCHN": "852564292393238558",
-	"IRCCHN": "#wikipedia-zh-afc-reviewer"
+	"IRCCHN": "#wikipedia-zh-afc-reviewer",
+	"IRCChannels": [
+		"#wikipedia-zh-afc",
+		"#wikipedia-zh-afc-reviewer"
+	],
+	"transport": [
+		[
+			"irc/#wikipedia-zh-afc",
+			"telegram/-1001320626590",
+			"discord/852563544619745280"
+		],
+		[
+			"irc/#wikipedia-zh-afc-reviewer",
+			"telegram/-1001391997174",
+			"discord/852564292393238558"
+		]
+	]
 }

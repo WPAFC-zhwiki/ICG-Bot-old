@@ -54,13 +54,13 @@ module.exports = {
 			await page.purge();
 			let output = `[${ user }](https://zhwp.org/User:${ encodeURI( user ) })`;
 
-			let wikitext = await page.text();
-			let html = await mwbot.parseWikitext( wikitext, {
+			const wikitext = await page.text();
+			const html = await mwbot.parseWikitext( wikitext, {
 				title: title,
-				uselang: 'zh-tw'
+				uselang: 'zh-hant'
 			} );
-			let $parseHTML = $( $.parseHTML( html ) );
-			let $submissionbox = $parseHTML.find( '.afc-submission-pending' ).length ?
+			const $parseHTML = $( $.parseHTML( html ) );
+			const $submissionbox = $parseHTML.find( '.afc-submission-pending' ).length ?
 				$parseHTML.find( '.afc-submission-pending' ).first() :
 				$parseHTML.find( '.afc-submission' ).first();
 			if ( !$submissionbox.length && page.namespace === 0 ) {
@@ -138,9 +138,7 @@ module.exports = {
 							reasons.push( getReason( $( $e ) ) );
 						}
 					} );
-					reasons.forEach( function ( v, i ) {
-						reason += `\n*${ i + 1 }*：${ v.trim() }`;
-					} );
+					reason += '\n• ' + reasons.join( '\n• ' );
 				}
 				output += reason;
 			}

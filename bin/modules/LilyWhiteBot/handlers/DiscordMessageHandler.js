@@ -63,6 +63,10 @@ class DiscordMessageHandler extends MessageHandler {
 				}
 			}
 
+			if ( text.trim() === '' ) {
+				return;
+			}
+
 			let context = new Context( {
 				from: rawdata.author.id,
 				to: rawdata.channel.id,

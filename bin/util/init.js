@@ -1,9 +1,10 @@
 const { Telegraf } = require( 'telegraf' ),
-	{ Client: Discord, Intents: DiscordIntents, Collection: DiscordCollection } = require( 'discord.js' ),
+	{ Client: Discord, Intents: DiscordIntents } = require( 'discord.js' ),
 	{ Client: IRC } = require( 'irc-upd' ),
 	{ mwn } = require( 'mwn' ),
 	credentials = require( './credentials.json' ),
-	config = require( './config.json' );
+	config = require( './config.json' ),
+	transport = {};
 
 const intents = new DiscordIntents();
 intents.add(
@@ -32,29 +33,52 @@ const dcBot = new Discord( { intents } ),
 		sasl: true,
 		password: credentials.IRC.password,
 		encoding: 'UTF-8',
-		autoConnect: false
+		autoConnect: false,
+		channels: config.IRCChannels
 	} ),
 	mwbot = new mwn( credentials.mwn );
 
 dcBot.login( credentials.DiscordToken ).catch( function ( e ) {
-	console.log( '\x1b[31m[E] [Discord]\x1b[0m Error:', e );
+	console.log( '\x1b[31m[ERR] [Discord]\x1b[0m Error:', e );
 } );
 
 dcBot.once( 'ready', function () {
-	console.log( `\x1b[32m[S] [Discord]\x1b[0m login as ${ dcBot.user.username }#${ dcBot.user.tag } (${ dcBot.user.id })` );
+	console.log( `\x1b[32m[INIT] [Discord]\x1b[0m login as ${ dcBot.user.username }#${ dcBot.user.tag } (${ dcBot.user.id })` );
 } );
 
-dcBot.commands = new DiscordCollection();
+dcBot.on( 'error', function ( err ) {
+	console.log( '\x1b[32m[ERR] [Discord]\x1b[0m', err );
+} );
 
 tgBot.telegram.getMe().then( function ( me ) {
-	console.log( `\x1b[32m[S] [Telegram]\x1b[0m login as ${ me.first_name }${ me.last_name || '' }@${ me.username } (${ me.id })` );
+	console.log( `\x1b[32m[INIT] [Telegram]\x1b[0m login as ${ me.first_name }${ me.last_name || '' }@${ me.username } (${ me.id })` );
 } ).catch( function ( e ) {
-	console.log( '\x1b[31m[E] [Telegram]\x1b[0m Telegraf.telegram.getMe() fail', e );
+	console.log( '\x1b[31m[INIT] [Telegram]\x1b[0m Telegraf.telegram.getMe() fail', e );
 	return null;
 } );
 
 tgBot.launch().catch( function ( e ) {
-	console.log( '\x1b[31m[E] [Telegram]\x1b[0m Error:', e );
+	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m Error:', e );
+} );
+
+tgBot.catch( function ( err ) {
+	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m', err );
+} );
+
+ircBot.connect();
+
+ircBot.on( 'registered', () => {
+	ircBot.whois( credentials.IRC.nick, function ( data ) {
+		try {
+			console.log( `\x1b[32m[INIT] [IRC]\x1b[0m login as ${ data.nick }!${ data.user }@${ data.host } (${ data.account })` );
+		} catch ( e ) {
+			console.log( '\x1b[31m[ERR] [IRC]\x1b[0m Error:', data, e );
+		}
+	} );
+} );
+
+ircBot.on( 'error', ( message ) => {
+	console.log( `\x1b[31m[ERR] [IRC]\x1b[0m Error: ${ message.command } (${ ( message.args || [] ).join( ' ' ) })` );
 } );
 
 if ( credentials.mwn.OAuthCredentials ) {
@@ -62,6 +86,46 @@ if ( credentials.mwn.OAuthCredentials ) {
 } else {
 	mwbot.login();
 }
+
+function parseTransportUID( u ) {
+	let client = null, id = null, uid = null;
+	if ( u ) {
+		let s = u.toString();
+		let i = s.indexOf( '/' );
+
+		if ( i !== -1 ) {
+			client = s.substr( 0, i ).toLowerCase();
+
+			id = s.substr( i + 1 );
+			uid = `${ client.toLowerCase() }/${ id }`;
+		}
+	}
+	return { client, id, uid };
+}
+
+config.transport.forEach( function ( group ) {
+	for ( let c1 of group ) {
+		let client1 = parseTransportUID( c1 ).uid;
+
+		if ( client1 ) {
+			for ( let c2 of group ) {
+				let client2 = parseTransportUID( c2 );
+				if ( client1 === client2.uid ) {
+					continue;
+				}
+				if ( !transport[ client1 ] ) {
+					transport[ client1 ] = {
+						discord: null,
+						telegram: null,
+						irc: null
+					};
+				}
+
+				transport[ client1 ][ client2.client ] = client2.id;
+			}
+		}
+	}
+} );
 
 const path = require( 'path' ),
 	window = new ( require( 'jsdom' ).JSDOM )( '' ).window,
@@ -82,7 +146,9 @@ function tgCommand( command ) {
 						// eslint-disable-next-line camelcase
 						parse_mode: 'Markdown',
 						// eslint-disable-next-line camelcase
-						reply_to_message_id: ctx.message
+						reply_to_message_id: ctx.message.message_id,
+						// eslint-disable-next-line camelcase
+						disable_web_page_preview: true
 					} ).catch( function () {
 						ctx.reply( tMsg );
 					} );
@@ -96,8 +162,10 @@ function tgCommand( command ) {
 					disable_web_page_preview: true
 				} );
 
-				if ( ctx.chat.id === config.TGREVGRP ) {
-					dcBot.channels.cache.get( config.DCREVCHN ).send( dMsg );
+				if ( transport[ `telegram/${ ctx.chat.id }` ] ) {
+					if ( transport[ `telegram/${ ctx.chat.id }` ].discord ) {
+						dcBot.channels.cache.get( transport[ `telegram/${ ctx.chat.id }` ].discord ).send( dMsg );
+					}
 				}
 			} );
 	} );
@@ -124,6 +192,17 @@ function dcCommand( command ) {
 						// eslint-disable-next-line camelcase
 						disable_web_page_preview: true
 					} );
+				}
+
+				if ( transport[ `discord/${ message.channel.id }` ] ) {
+					if ( transport[ `discord/${ message.channel.id }` ].telegram ) {
+						tgBot.telegram.sendMessage( transport[ `discord/${ message.channel.id }` ].telegram, tMsg, {
+							// eslint-disable-next-line camelcase
+							parse_mode: 'Markdown',
+							// eslint-disable-next-line camelcase
+							disable_web_page_preview: true
+						} );
+					}
 				}
 			} );
 	} );
@@ -166,6 +245,7 @@ module.exports = {
 	DCREVCHN: config.DCREVCHN,
 	TGREVGRP: config.TGREVGRP,
 	IRCCHN: config.IRCCHN,
+	transport,
 	bindCommand,
 	bindEvent,
 	loadModules,

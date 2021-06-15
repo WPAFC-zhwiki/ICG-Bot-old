@@ -49,7 +49,9 @@ function autoreview( wikitext = '', $parseHTML = $() ) {
 			// 目錄
 			'toc',
 			// edit
-			'mw-editsection'
+			'mw-editsection',
+			// {{AFC comment}}
+			'afc-comment'
 		]
 	};
 
@@ -119,7 +121,7 @@ function autoreview( wikitext = '', $parseHTML = $() ) {
 	if ( elements.refs.$references.length === 0 && elements.refs.all.$ele.length === 0 ) {
 		issues.push( 'unreferenced' );
 	} else {
-		if ( $( '<div>' ).append( elements.refs.$references ).text().length < contentLen / 200 ) {
+		if ( $( '<div>' ).append( elements.refs.$references ).length < contentLen / 200 ) {
 			issues.push( 'ref-improve' );
 		}
 

@@ -26,10 +26,6 @@ class IRCMessageHandler extends MessageHandler {
 			}
 		} );
 
-		client.on( 'error', ( message ) => {
-			console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m IRCBot error: ${ message.command } (${ ( message.args || [] ).join( ' ' ) })` );
-		} );
-
 		// 加载设置
 		this._type = 'IRC';
 		this._id = 'I';
@@ -248,7 +244,6 @@ class IRCMessageHandler extends MessageHandler {
 	async start() {
 		if ( !this._started ) {
 			this._started = true;
-			this._client.connect();
 		}
 	}
 
