@@ -27,7 +27,7 @@ const USERAGENT = 'LilyWhiteBot/1.6.0alpha (https://github.com/lziad/LilyWhiteBo
 const generateFileName = ( url, name ) => {
 	let extName = path.extname( name || '' );
 	if ( extName === '' ) {
-		extName = path.extname( url || '' );
+		extName = path.extname( typeof url.toString === 'function' && url.toString() || url || '' );
 	}
 	if ( extName === '.webp' ) {
 		extName = '.png';
@@ -63,11 +63,16 @@ const convertFileType = ( type ) => {
  * @return {Promise}
  */
 const getFileStream = ( file ) => {
-	let filePath = file.url || file.path;
+	let filePath = file.url.href || file.path;
 	let fileStream;
 
+	console.log( file.url );
+
 	if ( file.url ) {
-		fileStream = request.get( file.url );
+		fileStream = request( {
+			method: 'GET',
+			url: file.url
+		} );
 	} else if ( file.path ) {
 		fileStream = fs.createReadStream( file.path );
 	} else {

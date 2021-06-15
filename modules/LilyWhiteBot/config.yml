@@ -88,7 +88,7 @@ QQ:
 Discord:
   disabled: false                            # 如果需要 Discord 机器人，请设置为 false
   bot:
-    token: "$c:DiscordToken"
+    token: ""
   options:
     nickStyle: nickname                     # 可取「nickname」（使用者暱稱，僅在伺服器有效，否則仍用使用者名稱）、「username」（使用者名稱）、「id」（ID）
     useProxyURL: false                      # 考虑到中国网络情况，若 https://cdn.discordapp.com 被屏蔽请改成 true（对应 https://media.discordapp.net）
@@ -248,11 +248,11 @@ transport:
     #
     # 另外，如果使用酷 Q 的话，您需要定期自行清理酷 Q 的缓存！
     servemedia:
-      type: ""                              # 文件处理方式：省略/留空/none、self、vim-cn、imgur、sm.ms、linx、uguu
+      type: "self"                              # 文件处理方式：省略/留空/none、self、vim-cn、imgur、sm.ms、linx、uguu
 
       # type为self时有效
-      cachePath: ""                         # 缓存存放位置
-      serveUrl: ""                          # URL 的前缀，通常需要以斜线结尾
+      cachePath: "/mnt/nfs/labstore-secondary-tools-project/zhwp-afc-bot/www/static"                         # 缓存存放位置
+      serveUrl: "https://tools-static.wmflabs.org/zhwp-afc-bot/"                          # URL 的前缀，通常需要以斜线结尾
 
       # type为linx时有效
       linxApiUrl: ""                        # linx API 地址（例如 https://www.xxx.com/upload/），通常以斜线结尾
