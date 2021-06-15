@@ -85,7 +85,7 @@ const getFileStream = ( file ) => {
 		//     // 缩小表情包尺寸，因容易刷屏
 		//     fileStream = fileStream.pipe(sharp().resize(servemedia.stickerMaxWidth || 256).png());
 		// } else {
-		fileStream = fileStream.pipe( sharp().png() );
+		fileStream = fileStream.pipe();
 		// }
 	}
 

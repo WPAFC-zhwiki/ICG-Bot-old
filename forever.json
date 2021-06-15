@@ -1,0 +1,10 @@
+{
+	"uid": "ICG-BOT",
+	"append": true,
+	"watch": true,
+	"script": "index.js",
+	"sourceDir": "/data/project/zhwp-afc-bot/ICG-BOT/bin",
+	"logFile": "/data/project/zhwp-afc-bot/ICG-BOT/logs/forever.log",
+	"outFile": "/data/project/zhwp-afc-bot/ICG-BOT/logs/run.log",
+	"errFile": "/data/project/zhwp-afc-bot/ICG-BOT/logs/run.log"
+}
