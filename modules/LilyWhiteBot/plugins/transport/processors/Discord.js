@@ -84,7 +84,7 @@ const init = ( b, h, c ) => {
 
 	// 將訊息加工好並發送給其他群組
 	discordHandler.on( 'text', ( context ) => {
-		const send = () => bridge.send( context ).catch( ( e ) => console.log( `\x1b[33m[Connect]\x1b[0m ${ e.trace }` ) );
+		const send = () => bridge.send( context ).catch( ( e ) => console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m ${ e.trace }` ) );
 
 		userInfo.set( context.from, context._rawdata.author );
 
@@ -155,7 +155,7 @@ const init = ( b, h, c ) => {
 				if ( userInfo.has( at ) ) {
 					promises.push( Promise.resolve( userInfo.get( at ) ) );
 				} else {
-					promises.push( discordHandler.fetchUser( at ).catch( ( e ) => console.log( `\x1b[33m[Connect]\x1b[0m ${ e.stack }` ) ) );
+					promises.push( discordHandler.fetchUser( at ).catch( ( e ) => console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m ${ e.stack }` ) ) );
 				}
 			}
 
@@ -166,7 +166,7 @@ const init = ( b, h, c ) => {
 						context.text = context.text.replace( new RegExp( `<@${ info.id }>`, 'gu' ), `@${ discordHandler.getNick( info ) }` );
 					}
 				}
-			} ).catch( ( e ) => console.log( `\x1b[33m[Connect]\x1b[0m ${ e.trace }` ) ).then( () => send() );
+			} ).catch( ( e ) => console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m ${ e.trace }` ) ).then( () => send() );
 		} else {
 			send();
 		}

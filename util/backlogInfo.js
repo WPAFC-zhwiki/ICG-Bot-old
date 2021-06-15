@@ -1,7 +1,6 @@
-const $ = require( './jquery.js' ),
-	{ MessageEmbed: DiscordMessageEmbed } = require( 'discord.js' ),
-	config = require( '../util/config.js' ),
-	{ mwbot } = require( '../util/fn.js' );
+const { MessageEmbed: DiscordMessageEmbed } = require( 'discord.js' ),
+	config = require( '../util/config.json' ),
+	{ mwbot, jQuery: $ } = require( './init.js' );
 
 module.exports = async function () {
 	let list = await new mwbot.category( 'Category:正在等待審核的草稿' ).members();

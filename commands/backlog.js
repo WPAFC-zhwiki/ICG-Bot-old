@@ -1,4 +1,4 @@
-const getBacklogInfo = require( '../modules/backlogInfo.js' );
+const getBacklogInfo = require( '../util/backlogInfo.js' );
 
 module.exports = {
 	name: 'backlog',

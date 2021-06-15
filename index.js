@@ -1,7 +1,6 @@
-const { dcBot, tgBot, DCREVCHN, TGREVGRP } = require( './util/bots' );
+const { dcBot, tgBot } = require( './util/bots' );
 const fs = require( 'fs' ),
-	{ bindCommand } = require( './modules/command.js' ),
-	{ bindEvent } = require( './modules/event.js' ),
+	{ DCREVCHN, TGREVGRP, bindCommand, bindEvent, loadModules } = require( './util/init.js' ),
 	moment = require( 'moment' );
 
 console.log( '\x1b[34m[BOT]\x1b[0m Loading commands:' );
@@ -24,6 +23,13 @@ const eventFiles = fs
 for ( const file of eventFiles ) {
 	const event = require( `./events/${ file }` );
 	bindEvent( event );
+}
+
+const modulesDirs = fs
+	.readdirSync( './modules' );
+
+for ( const dir of modulesDirs ) {
+	loadModules( dir );
 }
 
 dcBot.once( 'ready', async () => {
@@ -107,5 +113,3 @@ dcBot.on( 'message', async ( message ) => {
 //     )
 //   }
 // }, 120000) //2 minutes
-
-require( './modules/LilyWhiteBot/main.js' );

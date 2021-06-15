@@ -39,7 +39,7 @@ const processWhois = ( context ) => {
 			}
 
 			let outputStr = output.join( '\n' );
-			console.log( `\x1b[33m[Connect]\x1b[0m [ircquery.js] Msg #${ context.msgId } whois: ${ outputStr }` );
+			console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [ircquery.js] Msg #${ context.msgId } whois: ${ outputStr }` );
 			context.reply( outputStr );
 		} );
 	} else {
@@ -77,7 +77,7 @@ const processNames = ( context ) => {
 
 		let outputStr = `Users on ${ chan }: ${ userlist.join( ', ' ) }`;
 		context.reply( outputStr );
-		console.log( `\x1b[33m[Connect]\x1b[0m [ircquery.js] Msg #${ context.msgId } names: ${ outputStr }` );
+		console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [ircquery.js] Msg #${ context.msgId } names: ${ outputStr }` );
 	}
 };
 
@@ -88,10 +88,10 @@ const processTopic = ( context ) => {
 
 		if ( topic ) {
 			context.reply( `Topic for channel ${ chan }: ${ topic }` );
-			console.log( `\x1b[33m[Connect]\x1b[0m [ircquery.js] Msg #${ context.msgId } topic: ${ topic }` );
+			console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [ircquery.js] Msg #${ context.msgId } topic: ${ topic }` );
 		} else {
 			context.reply( `No topic for ${ chan }` );
-			console.log( `\x1b[33m[Connect]\x1b[0m [ircquery.js] Msg #${ context.msgId } topic: No topic` );
+			console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [ircquery.js] Msg #${ context.msgId } topic: No topic` );
 		}
 	}
 };

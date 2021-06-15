@@ -323,7 +323,7 @@ const fileUploader = {
 			// 将聊天消息附带文件上传到服务器
 			for ( let [ index, file ] of context.extra.files.entries() ) {
 				if ( servemedia.sizeLimit && servemedia.sizeLimit > 0 && file.size && file.size > servemedia.sizeLimit * 1024 ) {
-					console.log( `\x1b[33m[Connect]\x1b[0m [file.js] <FileUploader> #${ context.msgId } File ${ index + 1 }/${ fileCount }: Size limit exceeded. Ignore.` );
+					console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [file.js] <FileUploader> #${ context.msgId } File ${ index + 1 }/${ fileCount }: Size limit exceeded. Ignore.` );
 				} else {
 					promises.push( uploadFile( file ) );
 				}
@@ -332,7 +332,7 @@ const fileUploader = {
 			// 整理上传到服务器之后到URL
 			let uploads = ( await Promise.all( promises ) ).filter( ( x ) => x );
 			for ( let [ index, upload ] of uploads.entries() ) {
-				console.log( `\x1b[33m[Connect]\x1b[0m [file.js] <FileUploader> #${ context.msgId } File ${ index + 1 }/${ uploads.length } (${ upload.type }): ${ upload.url }` );
+				console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [file.js] <FileUploader> #${ context.msgId } File ${ index + 1 }/${ uploads.length } (${ upload.type }): ${ upload.url }` );
 			}
 
 			return uploads;
@@ -350,7 +350,7 @@ module.exports = ( bridge, options ) => {
 		try {
 			msg.extra.uploads = await fileUploader.process( msg );
 		} catch ( e ) {
-			console.log( '\x1b[33m[Connect]\x1b[0m Error on processing files: ', e );
+			console.log( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m Error on processing files: ', e );
 			msg.callbacks.push( new bridge.BridgeMsg( msg, {
 				text: 'File upload error',
 				isNotice: true,

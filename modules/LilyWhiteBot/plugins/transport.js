@@ -149,7 +149,7 @@ module.exports = ( pluginManager, options ) => {
 	bridge.map = map;
 
 	// 调试日志
-	console.log( '\x1b[33m[Connect]\x1b[0m [transport.js] Bridge Map:' );
+	console.log( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [transport.js] Bridge Map:' );
 	for ( let client1 in map ) {
 		for ( let client2 in map[ client1 ] ) {
 			if ( map[ client1 ][ client2 ].disabled ) {
@@ -191,14 +191,14 @@ module.exports = ( pluginManager, options ) => {
 	}
 
 	// 调试日志
-	console.log( '\x1b[33m[Connect]\x1b[0m [transport.js] Aliases:' );
+	console.log( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [transport.js] Aliases:' );
 	let aliasesCount = 0;
 	for ( let alias in aliases2 ) {
-		console.log( `\x1b[33m[Connect]\x1b[0m ${ alias }: ${ aliases2[ alias ].shortname } ---> ${ aliases2[ alias ].fullname }` );
+		console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m ${ alias }: ${ aliases2[ alias ].shortname } ---> ${ aliases2[ alias ].fullname }` );
 		aliasesCount++;
 	}
 	if ( aliasesCount === 0 ) {
-		console.log( '\x1b[33m[Connect]\x1b[0m None' );
+		console.log( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m None' );
 	}
 
 	// 載入各用戶端的處理程式，並連接到 bridge 中

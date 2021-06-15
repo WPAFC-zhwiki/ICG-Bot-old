@@ -1,9 +1,7 @@
-const Discord = require( 'discord.js' ),
-	$ = require( '../modules/jquery.js' );
+const Discord = require( 'discord.js' );
 
-const { mwbot } = require( '../util/fn.js' ),
-	autoprview = require( '../modules/autoreview' ),
-	issuesData = require( '../modules/issuedata.json' );
+const { mwbot, jQuery: $ } = require( '../util/init.js' ),
+	{ autoreview, issuesData } = require( '../util/autoreview' );
 
 module.exports = {
 	name: 'autoreview',
@@ -29,7 +27,7 @@ module.exports = {
 		} );
 		const $parseHTML = $( $.parseHTML( html ) ).children();
 
-		const { issues } = autoprview( wikitext, $parseHTML );
+		const { issues } = autoreview( wikitext, $parseHTML );
 
 		let output = `系統剛剛自動審閱了[${ title }](https://zhwp.org/${ encodeURI( title ) })頁面，初步`;
 

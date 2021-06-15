@@ -6,9 +6,8 @@ const { MessageEmbed: DiscordMessageEmbed } = require( 'discord.js' ),
 
 	RTRC = new EventSource( 'https://stream.wikimedia.org/v2/stream/recentchange' );
 
-const { mwbot } = require( '../util/fn.js' ),
-	autoprview = require( '../modules/autoreview' ),
-	issuesData = require( '../modules/issuedata.json' );
+const { mwbot } = require( '../util/init.js' ),
+	{ autoreview, issuesData } = require( '../util/autoreview' );
 
 function getReason( $e = $( '<div>' ) ) {
 	if ( $e.find( 'table' ).length ) {
@@ -61,7 +60,9 @@ module.exports = {
 				uselang: 'zh-tw'
 			} );
 			let $parseHTML = $( $.parseHTML( html ) );
-			let $submissionbox = $parseHTML.find( '.afc-submission' ).first();
+			let $submissionbox = $parseHTML.find( '.afc-submission-pending' ).length ?
+				$parseHTML.find( '.afc-submission-pending' ).first() :
+				$parseHTML.find( '.afc-submission' ).first();
 			if ( !$submissionbox.length && page.namespace === 0 ) {
 				output += `已接受[${ creator }](https://zhwp.org/User:${ encodeURI( creator ) })的草稿[${ title }](https://zhwp.org/${ encodeURI( title ) })`;
 				let tpClass;
@@ -101,7 +102,7 @@ module.exports = {
 				}
 				output += `草稿[${ title }](https://zhwp.org/${ encodeURI( title ) })`;
 
-				const { issues } = autoprview( wikitext, $parseHTML );
+				const { issues } = autoreview( wikitext, $parseHTML );
 
 				if ( issues && issues.length > 0 ) {
 					output += '\n\n*自動檢測問題*\n• ' + issues.map( ( x ) => `${ issuesData[ x ] } (${ x })` ).join( '\n• ' );

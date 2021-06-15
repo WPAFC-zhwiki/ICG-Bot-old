@@ -33,12 +33,12 @@ module.exports = ( pluginManager, options ) => {
 					if ( client.client === 'IRC' ) {
 						sentCount++;
 						ircHandler.say( client.id, context.param );
-						console.log( `\x1b[33m[Connect]\x1b[0m [irccommand.js] Msg #${ context.msgId }: IRC command has sent to ${ client.id }. Param = ${ context.param }` );
+						console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [irccommand.js] Msg #${ context.msgId }: IRC command has sent to ${ client.id }. Param = ${ context.param }` );
 					}
 				}
 
 				if ( sentCount === 0 ) {
-					console.log( `\x1b[33m[Connect]\x1b[0m [irccommand.js] Msg #${ context.msgId }: No IRC targets.` );
+					console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [irccommand.js] Msg #${ context.msgId }: No IRC targets.` );
 				}
 			} else {
 				context.reply( `用法: /${ prefix }command <命令>` );

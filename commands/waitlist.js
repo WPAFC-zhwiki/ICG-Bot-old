@@ -1,7 +1,7 @@
 const Discord = require( 'discord.js' );
 
-const config = require( '../util/config.js' ),
-	fn = require( '../util/fn.js' );
+const config = require( '../util/config.json' ),
+	getBacklogInfo = require( '../util/backlogInfo.js' );
 
 module.exports = {
 	name: 'waitlist',
@@ -12,7 +12,7 @@ module.exports = {
 	 * @type {import('../modules/command').run}
 	 */
 	run: async ( _client, args, reply ) => {
-		const { list } = await fn.getBacklogInfo( fn.mwbot );
+		const { list } = await getBacklogInfo();
 		let i = -1, len = 0, j = 0, s = 0;
 		for ( let page of list ) {
 			const link = `[${ page.title }](https://zhwp.org/${ page.title })\n`;

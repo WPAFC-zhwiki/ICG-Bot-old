@@ -132,7 +132,7 @@ module.exports = ( bridge, options ) => {
 
 			// 判斷當前群組是否在處理範圍內
 			if ( disables.indexOf( msg.to_uid ) !== -1 ) {
-				console.log( `\x1b[33m[Connect]\x1b[0m [command.js] Msg #${ msg.msgId } command ignored.` );
+				console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [command.js] Msg #${ msg.msgId } command ignored.` );
 				return Promise.resolve();
 			}
 
@@ -141,7 +141,7 @@ module.exports = ( bridge, options ) => {
 			}
 
 			if ( func && ( typeof func === 'function' ) ) {
-				console.log( `\x1b[33m[Connect]\x1b[0m [command.js] Msg #${ msg.msgId } command: ${ msg.command }` );
+				console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [command.js] Msg #${ msg.msgId } command: ${ msg.command }` );
 				return func( msg );
 			} else {
 				return Promise.resolve();

@@ -7,10 +7,10 @@ module.exports = ( pluginManager, options ) => {
 		tg.addCommand( 'thisgroupid', ( context ) => {
 			if ( context.isPrivate ) {
 				context.reply( `YourId = ${ context.from }` );
-				console.log( `\x1b[33m[Connect]\x1b[0m [groupid-tg.js] Msg #${ context.msgId }: YourId = ${ context.from }` );
+				console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [groupid-tg.js] Msg #${ context.msgId }: YourId = ${ context.from }` );
 			} else {
 				context.reply( `GroupId = ${ context.to }` );
-				console.log( `\x1b[33m[Connect]\x1b[0m [groupid-tg.js] Msg #${ context.msgId }: GroupId = ${ context.to }` );
+				console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [groupid-tg.js] Msg #${ context.msgId }: GroupId = ${ context.to }` );
 			}
 		} );
 	}

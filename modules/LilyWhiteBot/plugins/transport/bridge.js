@@ -89,10 +89,10 @@ const bridge = {
 		let msg = getBridgeMsg( m );
 
 		let currMsgId = msg.msgId;
-		console.log( `\x1b[33m[Connect]\x1b[0m [bridge.js] <UserSend> #${ currMsgId } ${ msg.from_uid } ---> ${ msg.to_uid }: ${ msg.text }` );
+		console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [bridge.js] <UserSend> #${ currMsgId } ${ msg.from_uid } ---> ${ msg.to_uid }: ${ msg.text }` );
 		let extraJson = JSON.stringify( msg.extra );
 		if ( extraJson !== 'null' && extraJson !== '{}' ) {
-			console.log( `\x1b[33m[Connect]\x1b[0m [bridge.js] <UserSend> #${ currMsgId } extra: ${ extraJson }` );
+			console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [bridge.js] <UserSend> #${ currMsgId } extra: ${ extraJson }` );
 		}
 
 		return prepareMsg( msg ).then( () => {
@@ -114,10 +114,10 @@ const bridge = {
 				promises.push( bridge.emitHook( 'bridge.receive', msg2 ).then( ( _ ) => {
 					let processor = processors.get( client );
 					if ( processor ) {
-						console.log( `\x1b[33m[Connect]\x1b[0m [bridge.js] <BotTransport> #${ currMsgId } ---> ${ new_uid.uid }` );
+						console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [bridge.js] <BotTransport> #${ currMsgId } ---> ${ new_uid.uid }` );
 						return processor.receive( msg2 );
 					} else {
-						console.log( `\x1b[33m[Connect]\x1b[0m [bridge.js] <BotTransport> #${ currMsgId } -X-> ${ new_uid.uid }: No processor` );
+						console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [bridge.js] <BotTransport> #${ currMsgId } -X-> ${ new_uid.uid }: No processor` );
 					}
 				} ) );
 			}
@@ -125,11 +125,11 @@ const bridge = {
 			return Promise.all( promises )
 				.catch( ( e ) => {
 					allresolved = false;
-					console.log( '\x1b[33m[Connect]\x1b[0m [bridge.js] <BotSend> Rejected: ', e );
+					console.log( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [bridge.js] <BotSend> Rejected: ', e );
 				} ).then( () => {
 					bridge.emitHook( 'bridge.sent', msg );
 					if ( promises.length > 0 ) {
-						console.log( `\x1b[33m[Connect]\x1b[0m [bridge.js] <BotSend> #${ currMsgId } done.` );
+						console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [bridge.js] <BotSend> #${ currMsgId } done.` );
 					} else {
 						console.log( `[bridge.js] <BotSend> #${ currMsgId } has no targets. Ignored.` );
 					}

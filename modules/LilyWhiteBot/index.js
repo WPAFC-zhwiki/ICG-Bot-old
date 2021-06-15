@@ -50,7 +50,7 @@ for ( let type of allHandlers.keys() ) {
 		enabledClients.push( type );
 	}
 }
-console.log( `\x1b[33m[Connect]\x1b[0m Enabled clients: ${ enabledClients.join( ', ' ) }` );
+console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m Enabled clients: ${ enabledClients.join( ', ' ) }` );
 
 for ( let client of enabledClients ) {
 	const options = config[ client ];
@@ -68,11 +68,11 @@ for ( let client of enabledClients ) {
 /**
  * 載入擴充套件
  */
-console.info( '\x1b[33m[Connect]\x1b[0m Loading plugins...' );
+console.info( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m Loading plugins...' );
 pluginManager.config = config;
 for ( let plugin of config.plugins ) {
 	try {
-		console.info( `\x1b[33m[Connect]\x1b[0m Loading plugin: ${ plugin }` );
+		console.info( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m Loading plugin: ${ plugin }` );
 		let p = require( `./plugins/${ plugin }.js` )( pluginManager, config[ plugin ] || {} );
 		if ( p ) {
 			pluginManager.plugins[ plugin ] = p;
@@ -80,9 +80,9 @@ for ( let plugin of config.plugins ) {
 			pluginManager.plugins[ plugin ] = true;
 		}
 	} catch ( ex ) {
-		console.error( `\x1b[33m[Connect]\x1b[0m Error while loading plugin ${ plugin }: `, ex );
+		console.error( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m Error while loading plugin ${ plugin }: `, ex );
 	}
 }
 if ( !config.plugins || config.plugins.length === 0 ) {
-	console.info( '\x1b[33m[Connect]\x1b[0m No plugins loaded.' );
+	console.info( '\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m No plugins loaded.' );
 }

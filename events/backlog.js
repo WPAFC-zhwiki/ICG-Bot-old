@@ -1,5 +1,5 @@
 const { CronJob } = require( 'cron' ),
-	getBacklogInfo = require( '../modules/backlogInfo.js' );
+	getBacklogInfo = require( '../util/backlogInfo.js' );
 
 module.exports = {
 	name: 'backlog',
