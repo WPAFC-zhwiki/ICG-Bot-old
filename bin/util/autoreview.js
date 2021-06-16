@@ -1,6 +1,6 @@
 const $ = require( './init.js' ).jQuery;
 
-function autoreview( wikitext = '', $parseHTML = $() ) {
+async function autoreview( wikitext = '', $parseHTML = $() ) {
 	let delval = {
 		tags: [
 			// 表格
@@ -86,6 +86,8 @@ function autoreview( wikitext = '', $parseHTML = $() ) {
 	let refs = {};
 	refs.wt = ( wikitext.match( /<ref.*?>.*?<\/ref>/gi ) || [] ).map( ( x, i ) => [ i, x ] );
 	refs.$ele = $parseHTML.find( 'ol.references' );
+	refs.$ele.find( '.mw-cite-backlink' ).remove();
+
 	elements.refs = {
 		all: refs,
 		default: refs.wt.filter( function ( [ _i, x ] ) {
@@ -145,7 +147,10 @@ function autoreview( wikitext = '', $parseHTML = $() ) {
 		issues.push( 'uncategorized' );
 	}
 
-	let emCnt = ( wikitext.match( /(?:''|<(?:em|i|b)>|【)(?:.*?)(?:''|<\/(?:em|i|b)>|】)/g ) || [] ).length;
+	let em = wikitext
+		.replace( /<ref.*?<\/ref>/g, '' )
+		.match( /(?:''|<(?:em|i|b)>|【)(?:.*?)(?:''|<\/(?:em|i|b)>|】)/g ) || [];
+	let emCnt = em.length;
 	if ( emCnt > ( wikitext.match( /==(?:.*?)==/g ) || [] ).length ) {
 		issues.push( 'over-emphasize' );
 	}
@@ -155,7 +160,6 @@ function autoreview( wikitext = '', $parseHTML = $() ) {
 			return x.match( /^\s+(?!$)/ );
 		} ).length &&
 		$parseHTML.find( 'pre' ).filter( function ( _i, ele ) {
-
 			let parent = $( ele ).parent().get( 0 );
 			return Array.from( parent.classList ).indexOf( 'mw-0highlight' ) > -1;
 		} ).length

@@ -107,10 +107,6 @@ module.exports = function ( $msg, logs ) {
 		logs.parseret = ret.join( '\\n' );
 		log.add( logs );
 		return ret.join( '\n' );
-	} else {
-		logs.parse = false;
-		logs.parseret = ret.join( '\\n' );
-		log.add( logs );
-		return null;
 	}
+	return null;
 };

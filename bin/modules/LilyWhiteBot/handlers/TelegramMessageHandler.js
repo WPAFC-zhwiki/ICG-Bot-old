@@ -19,6 +19,7 @@ class TelegramMessageHandler extends MessageHandler {
 			botConfig[ key ] = botConfig[ key ] || tgOptions[ key ];
 		}
 
+		const { tgOnMessage } = require( '../../../util/init.js' );
 		const client = require( '../../../util/bots' ).tgBot;
 
 		if ( botConfig.webhook && botConfig.webhook.port > 0 ) {
@@ -76,7 +77,7 @@ class TelegramMessageHandler extends MessageHandler {
 		this._startTime = new Date().getTime() / 1000;
 		this._keepSilence = tgOptions.keepSilence || [];
 
-		client.on( 'message', async ( ctx, next ) => {
+		tgOnMessage( async ( ctx ) => {
 			if ( this._enabled && ctx.message && ctx.chat ) {
 				if ( ctx.message.date < this._startTime ) {
 					return;
@@ -234,7 +235,6 @@ class TelegramMessageHandler extends MessageHandler {
 					}
 				}
 			}
-			return next();
 		} );
 	}
 

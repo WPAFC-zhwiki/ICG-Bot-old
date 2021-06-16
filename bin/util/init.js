@@ -57,12 +57,12 @@ tgBot.telegram.getMe().then( function ( me ) {
 	return null;
 } );
 
-tgBot.launch().catch( function ( e ) {
-	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m Error:', e );
-} );
-
 tgBot.catch( function ( err ) {
 	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m', err );
+} );
+
+tgBot.launch().catch( function ( e ) {
+	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m Error:', e );
 } );
 
 ircBot.connect();
@@ -127,18 +127,43 @@ config.transport.forEach( function ( group ) {
 	}
 } );
 
+/**
+ * @typedef {import('telegraf').Context} ctx
+ */
+
+/**
+ * @type {((ctx: ctx)=>void)[]}
+ */
+const tgOnMessageFunc = [];
+
+/**
+ * @param {(ctx: ctx)=>void} func
+ */
+function tgOnMessage( func ) {
+	tgOnMessageFunc.push( func );
+}
+
+tgBot.on( 'message', function ( ctx, next ) {
+	tgOnMessageFunc.forEach( function ( func ) {
+		func( ctx );
+	} );
+	return next();
+} );
+
 const path = require( 'path' ),
 	window = new ( require( 'jsdom' ).JSDOM )( '' ).window,
 	jQuery = require( 'jquery' )( window, true );
 
 function tgCommand( command ) {
-	tgBot.telegram.setMyCommands( [ {
-		command: command.name,
-		description: command.description
-	} ] );
-	tgBot.command( command.name, function ( ctx ) {
-		let args = ctx.message.text.split( ' ' );
-		args.shift();
+	const regex = /^\/([^@\s]+)@?(?:(\S+)|)\s?([\s\S]+)?$/i;
+	tgOnMessage( function ( ctx ) {
+		const messageText = ctx.message.text;
+		const parts = regex.exec( messageText );
+		if ( !parts || parts[ 1 ] !== command.name ) {
+			return;
+		}
+		console.log( `\x1b[38m[COMMAND]\x1b[0m ${ parts[ 1 ] } fire` );
+		let args = !parts[ 3 ] ? [] : parts[ 3 ].split( /\s+/ ).filter( ( arg ) => arg.length );
 		command.run( { dcBot, tgBot }, args,
 			function ( { tMsg, dMsg }, iserror ) {
 				if ( iserror ) {
@@ -209,13 +234,13 @@ function dcCommand( command ) {
 }
 
 function bindCommand( command ) {
-	console.log( `\x1b[33m[Command]\x1b[0m Load command ${ command.name }` );
+	console.log( `\x1b[33m[COMMAND]\x1b[0m Load command ${ command.name }` );
 	dcCommand( command );
 	tgCommand( command );
 }
 
 function bindEvent( event ) {
-	console.log( `\x1b[33m[Event]\x1b[0m Load event ${ event.name }` );
+	console.log( `\x1b[33m[EVENT]\x1b[0m Load event ${ event.name }` );
 	event.fire( function ( { tMsg, dMsg } ) {
 		dcBot.channels.cache.get( config.DCREVCHN ).send( dMsg );
 		tgBot.telegram.sendMessage( config.TGREVGRP, tMsg, {
@@ -240,6 +265,7 @@ function loadModules( dir ) {
 module.exports = {
 	dcBot,
 	tgBot,
+	tgOnMessage,
 	ircBot,
 	mwbot,
 	DCREVCHN: config.DCREVCHN,

@@ -63,7 +63,7 @@ class DiscordMessageHandler extends MessageHandler {
 				}
 			}
 
-			if ( text.trim() === '' ) {
+			if ( text.trim() === '' || rawdata.author.bot ) {
 				return;
 			}
 

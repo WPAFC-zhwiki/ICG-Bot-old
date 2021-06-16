@@ -1,10 +1,16 @@
-const { transport } = require( '../../util/init.js' ),
+const { transport, tgOnMessage } = require( '../../util/init.js' ),
 	{ dcBot, tgBot, ircBot } = require( '../../util/bots.js' ),
 	irccolor = require( 'irc-colors' ),
 	parser = require( './parselink' );
 let logs = {};
 
+console.log( '\x1b[36m[Modules] [LinkBot]\x1b[0m start link bot......' );
+
 dcBot.on( 'message', function ( message ) {
+	if ( message.author.id === dcBot.user.id || message.author.bot ) {
+		return;
+	}
+
 	logs = {
 		clent: 'Discord',
 		from: message.author.tag + '(' + message.author.id + ')',
@@ -19,22 +25,21 @@ dcBot.on( 'message', function ( message ) {
 	} );
 } );
 
-tgBot.on( 'message', function ( ctx ) {
-	if ( typeof ctx.message.text !== 'string' && typeof ctx.message.caption !== 'string' ) {
-		return;
-	}
-	logs = {
-		client: 'Telegram',
-		from: ctx.from.id,
-		chatid: ctx.chat.id,
-		messageid: ctx.message.message_id,
-		message: ( ctx.message.text || ctx.message.caption + ' (caption)' ).replace( /\n/g, '\\n' ),
-		bot: ctx.from.is_bot
-	};
+tgOnMessage( function ( ctx ) {
+	if ( typeof ctx.message.text === 'string' || typeof ctx.message.caption === 'string' ) {
+		logs = {
+			client: 'Telegram',
+			from: ctx.from.id,
+			chatid: ctx.chat.id,
+			messageid: ctx.message.message_id,
+			message: ( ctx.message.text || ctx.message.caption + ' (caption)' ).replace( /\n/g, '\\n' ),
+			bot: ctx.from.is_bot
+		};
 
-	parselink( ( ctx.message.text || ctx.message.caption + ' (caption)' ), 'telegram', ctx.chat.id, logs, function ( msg ) {
-		ctx.reply( msg );
-	} );
+		parselink( ( ctx.message.text || ctx.message.caption + ' (caption)' ), 'telegram', ctx.chat.id, logs, function ( msg ) {
+			ctx.reply( msg );
+		} );
+	}
 } );
 
 ircBot.on( 'message', function ( from, to, text ) {

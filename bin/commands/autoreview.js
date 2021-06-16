@@ -33,14 +33,19 @@ module.exports = {
 		} );
 		const $parseHTML = $( $.parseHTML( html ) ).children();
 
-		const { issues } = autoreview( wikitext, $parseHTML );
+		reply( {
+			tMsg: '請稍後，正在執行中......',
+			dMsg: '請稍後，正在執行中......'
+		}, true );
 
-		let output = `系統剛剛自動審閱了[${ title }](https://zhwp.org/${ encodeURI( title ) })頁面，初步`;
+		const { issues, cvScore } = await autoreview( wikitext, $parseHTML );
+
+		let output = `系統剛剛自動審閱了[${ title }](https://zhwp.org/${ encodeURI( title ) })頁面，檢查結果：`;
 
 		if ( issues && issues.length > 0 ) {
-			output += '發現可能存在以下問題：\n• ' + issues.map( ( x ) => `${ issuesData[ x ] } (${ x })` ).join( '\n• ' );
+			output += '\n• ' + issues.map( ( x ) => `${ issuesData[ x ] } (${ x })` ).join( '\n• ' );
 		} else {
-			output += '沒有發現顯著的問題。';
+			output += '\n• 沒有發現顯著的問題。';
 		}
 
 		const dMsg = new Discord.MessageEmbed()

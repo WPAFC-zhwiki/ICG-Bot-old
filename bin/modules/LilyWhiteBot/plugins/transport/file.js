@@ -20,7 +20,7 @@ const USERAGENT = 'LilyWhiteBot/1.6.0alpha (https://github.com/lziad/LilyWhiteBo
 /**
  * 根据已有文件名生成新文件名
  *
- * @param url
+ * @param {URL} url
  * @param {string} name 文件名
  * @return {string} 新文件名
  */
@@ -85,7 +85,7 @@ const getFileStream = ( file ) => {
 		//     // 缩小表情包尺寸，因容易刷屏
 		//     fileStream = fileStream.pipe(sharp().resize(servemedia.stickerMaxWidth || 256).png());
 		// } else {
-		fileStream = fileStream.pipe();
+		fileStream = fileStream.pipe( sharp().png() );
 		// }
 	}
 
@@ -327,6 +327,7 @@ const fileUploader = {
 
 			// 将聊天消息附带文件上传到服务器
 			for ( let [ index, file ] of context.extra.files.entries() ) {
+				// eslint-disable-next-line max-len
 				if ( servemedia.sizeLimit && servemedia.sizeLimit > 0 && file.size && file.size > servemedia.sizeLimit * 1024 ) {
 					console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m [file.js] <FileUploader> #${ context.msgId } File ${ index + 1 }/${ fileCount }: Size limit exceeded. Ignore.` );
 				} else {
@@ -347,6 +348,7 @@ const fileUploader = {
 	}
 };
 
+// eslint-disable-next-line no-shadow
 module.exports = ( bridge, options ) => {
 	fileUploader.init( options );
 	fileUploader.handlers = bridge.handlers;

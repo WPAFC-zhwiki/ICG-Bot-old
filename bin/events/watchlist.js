@@ -102,10 +102,12 @@ module.exports = {
 				}
 				output += `草稿[${ title }](https://zhwp.org/${ encodeURI( title ) })`;
 
-				const { issues } = autoreview( wikitext, $parseHTML );
+				const { issues, cvScore } = await autoreview( wikitext, $parseHTML );
+
+				output += `\n\n*自動檢測問題*\n• 侵權檢查相似度 ${ cvScore }%`;
 
 				if ( issues && issues.length > 0 ) {
-					output += '\n\n*自動檢測問題*\n• ' + issues.map( ( x ) => `${ issuesData[ x ] } (${ x })` ).join( '\n• ' );
+					output += '\n• ' + issues.map( ( x ) => `${ issuesData[ x ] } (${ x })` ).join( '\n• ' );
 				}
 			} else if ( $submissionbox.hasClass( 'afc-submission-declined' ) || $submissionbox.hasClass( 'afc-submission-rejected' ) ) {
 				output += '將';

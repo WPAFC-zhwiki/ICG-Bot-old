@@ -104,8 +104,8 @@ plugins:
   - transport                               # 啟用互聯功能，不想禁止互聯的話請勿移除
   - groupid-tg                              # 取得目前 Telegram 群組的 ID，
                                             # 可在正式連接之前啟用該套件，然後在 Telegram 群中使用 /thisgroupid 取得ID
-#  - ircquery                                # 允許查詢 IRC 的一些訊息
-#  - irccommand                              # 允許向 IRC 發送一些命令（注意，不是 IRC 命令而是給頻道內機器人使用的命令）
+  - ircquery                                # 允許查詢 IRC 的一些訊息
+  - irccommand                              # 允許向 IRC 發送一些命令（注意，不是 IRC 命令而是給頻道內機器人使用的命令）
 
 
 # 各插件（套件）设置
@@ -128,12 +128,9 @@ transport:
   # 如果希望把同一軟體的多個群組連接到一起，可為不同的群組設置不同的別名，
   # 這樣互聯機器人在轉發訊息時會採用自訂群組名，以免混淆
   aliases:
-    "qq/87665432": "分部"
-    "qq/12345678": ["简称", "本群全称"]
 
   # 如果需要设置单向转发/不转发，例如 Telegram 群不向 QQ 转发，请在下面设置
   disables:
-    "telegram/-12345678": ["qq/12345678"]
 
   options:
     IRC:
@@ -186,11 +183,10 @@ transport:
       # 下面是其他群里面互联机器人的名称。在转发这些机器人的消息时，程序会尝试从消息中提取出真正的昵称，
       # 而不是显示机器人的名称。参数“[]”、“<>”指真正发消息者昵称两边的括号样式，目前只支持这两种括号。
       forwardBots:
-        XiaoT_bot: "[]"
+        zhwiki-afc-helper: "[]"
+        zhwiki-afc-helper-test: "[]"
+        Sunny00217Bot: "[]"
         zhmrtbot: "[]"
-        Sakura_fwdbot: "[]"
-        orgdigbot: "[]"
-        sauketubot: "[]"
 
     Discord:
       # 下面是其他群里面互联机器人的名称。在转发这些机器人的消息时，程序会尝试从消息中提取出真正的昵称，

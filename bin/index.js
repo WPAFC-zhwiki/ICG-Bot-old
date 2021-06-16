@@ -8,10 +8,18 @@ const commandFiles = fs
 	.readdirSync( './commands' )
 	.filter( ( file ) => file.endsWith( '.js' ) );
 
+const commandList = [];
+
 for ( const file of commandFiles ) {
 	const command = require( `./commands/${ file }` );
 	bindCommand( command );
+	commandList.push( {
+		command: command.name,
+		description: command.description
+	} );
 }
+
+tgBot.telegram.setMyCommands( commandList );
 
 console.log( '\x1b[34m[BOT]\x1b[0m Loading events:' );
 
