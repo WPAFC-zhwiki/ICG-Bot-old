@@ -33,10 +33,7 @@ tgBot.on( 'message', function ( ctx ) {
 	};
 
 	parselink( ( ctx.message.text || ctx.message.caption + ' (caption)' ), 'telegram', ctx.chat.id, logs, function ( msg ) {
-		ctx.reply( msg, {
-			// eslint-disable-next-line camelcase
-			reply_to_message_id: ctx.message.message_id
-		} );
+		ctx.reply( msg );
 	} );
 } );
 
@@ -71,6 +68,10 @@ function parselink( text = '', client = '', chat = '', logs = {}, reply = functi
 	}
 
 	reply( result );
+
+	if ( text.startsWith( '(NOFWD)' ) ) {
+		return;
+	}
 
 	if ( transport[ `${ client }/${ chat }` ] ) {
 		for ( let key in transport[ `${ client }/${ chat }` ] ) {
