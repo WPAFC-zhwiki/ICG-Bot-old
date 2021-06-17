@@ -102,9 +102,9 @@ module.exports = {
 				}
 				output += `草稿[${ title }](https://zhwp.org/${ encodeURI( title ) })`;
 
-				const { issues, cvScore } = await autoreview( wikitext, $parseHTML );
+				const { issues } = await autoreview( wikitext, $parseHTML );
 
-				output += `\n\n*自動檢測問題*\n• 侵權檢查相似度 ${ cvScore }%`;
+				output += '\n\n*自動檢測問題*';
 
 				if ( issues && issues.length > 0 ) {
 					output += '\n• ' + issues.map( ( x ) => `${ issuesData[ x ] } (${ x })` ).join( '\n• ' );

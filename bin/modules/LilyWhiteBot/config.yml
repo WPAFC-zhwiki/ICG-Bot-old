@@ -106,6 +106,7 @@ plugins:
                                             # 可在正式連接之前啟用該套件，然後在 Telegram 群中使用 /thisgroupid 取得ID
   - ircquery                                # 允許查詢 IRC 的一些訊息
   - irccommand                              # 允許向 IRC 發送一些命令（注意，不是 IRC 命令而是給頻道內機器人使用的命令）
+  - pia
 
 
 # 各插件（套件）设置
@@ -186,6 +187,7 @@ transport:
         zhwiki-afc-helper: "[]"
         zhwiki-afc-helper-test: "[]"
         Sunny00217Bot: "[]"
+        AFC-zhwp-helper: "[]"
         zhmrtbot: "[]"
 
     Discord:

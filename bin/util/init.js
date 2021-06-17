@@ -24,7 +24,7 @@ const dcBot = new Discord( { intents } ),
 	tgBot = new Telegraf( credentials.TelegramToken ),
 	ircBot = new IRC( 'irc.libera.chat', credentials.IRC.nick, {
 		userName: credentials.IRC.userName,
-		realName: 'Sunny00217Bot',
+		realName: '轉發其他聊天平台上*真人*的消息',
 		port: 6697,
 		autoRejoin: true,
 		secure: true,
@@ -55,6 +55,10 @@ tgBot.telegram.getMe().then( function ( me ) {
 } ).catch( function ( e ) {
 	console.log( '\x1b[31m[INIT] [Telegram]\x1b[0m Telegraf.telegram.getMe() fail', e );
 	return null;
+} );
+
+tgBot.on( 'polling_error', function ( err ) {
+	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m', err );
 } );
 
 tgBot.catch( function ( err ) {
@@ -127,36 +131,13 @@ config.transport.forEach( function ( group ) {
 	}
 } );
 
-/**
- * @typedef {import('telegraf').Context} ctx
- */
-
-/**
- * @type {((ctx: ctx)=>void)[]}
- */
-const tgOnMessageFunc = [];
-
-/**
- * @param {(ctx: ctx)=>void} func
- */
-function tgOnMessage( func ) {
-	tgOnMessageFunc.push( func );
-}
-
-tgBot.on( 'message', function ( ctx, next ) {
-	tgOnMessageFunc.forEach( function ( func ) {
-		func( ctx );
-	} );
-	return next();
-} );
-
 const path = require( 'path' ),
 	window = new ( require( 'jsdom' ).JSDOM )( '' ).window,
 	jQuery = require( 'jquery' )( window, true );
 
 function tgCommand( command ) {
 	const regex = /^\/([^@\s]+)@?(?:(\S+)|)\s?([\s\S]+)?$/i;
-	tgOnMessage( function ( ctx ) {
+	tgBot.on( 'message', function ( ctx, next ) {
 		const messageText = ctx.message.text;
 		const parts = regex.exec( messageText );
 		if ( !parts || parts[ 1 ] !== command.name ) {
@@ -164,35 +145,40 @@ function tgCommand( command ) {
 		}
 		console.log( `\x1b[38m[COMMAND]\x1b[0m ${ parts[ 1 ] } fire` );
 		let args = !parts[ 3 ] ? [] : parts[ 3 ].split( /\s+/ ).filter( ( arg ) => arg.length );
-		command.run( { dcBot, tgBot }, args,
-			function ( { tMsg, dMsg }, iserror ) {
-				if ( iserror ) {
+
+		// eslint-disable-next-line no-new
+		new Promise( function () {
+			command.run( { dcBot, tgBot }, args,
+				function ( { tMsg, dMsg }, iserror ) {
+					if ( iserror ) {
+						ctx.reply( tMsg, {
+							// eslint-disable-next-line camelcase
+							parse_mode: 'Markdown',
+							// eslint-disable-next-line camelcase
+							reply_to_message_id: ctx.message.message_id,
+							// eslint-disable-next-line camelcase
+							disable_web_page_preview: true
+						} ).catch( function () {
+							ctx.reply( tMsg );
+						} );
+						return;
+					}
+
 					ctx.reply( tMsg, {
 						// eslint-disable-next-line camelcase
 						parse_mode: 'Markdown',
 						// eslint-disable-next-line camelcase
-						reply_to_message_id: ctx.message.message_id,
-						// eslint-disable-next-line camelcase
 						disable_web_page_preview: true
-					} ).catch( function () {
-						ctx.reply( tMsg );
 					} );
-					return;
-				}
 
-				ctx.reply( tMsg, {
-					// eslint-disable-next-line camelcase
-					parse_mode: 'Markdown',
-					// eslint-disable-next-line camelcase
-					disable_web_page_preview: true
-				} );
-
-				if ( transport[ `telegram/${ ctx.chat.id }` ] ) {
-					if ( transport[ `telegram/${ ctx.chat.id }` ].discord ) {
-						dcBot.channels.cache.get( transport[ `telegram/${ ctx.chat.id }` ].discord ).send( dMsg );
+					if ( transport[ `telegram/${ ctx.chat.id }` ] ) {
+						if ( transport[ `telegram/${ ctx.chat.id }` ].discord ) {
+							dcBot.channels.cache.get( transport[ `telegram/${ ctx.chat.id }` ].discord ).send( dMsg );
+						}
 					}
-				}
-			} );
+				} );
+		} );
+		return next();
 	} );
 }
 
@@ -252,20 +238,19 @@ function bindEvent( event ) {
 	} );
 }
 
-function loadModules( dir ) {
-	console.log( `\x1b[33m[Modules]\x1b[0m Load module ${ dir }` );
-	const index = path.join( __dirname, '../modules', dir, 'index.js' );
+function loadModules( module ) {
+	console.log( `\x1b[33m[Modules]\x1b[0m Load module ${ module.replace( /\.js$/, '' ) }` );
+	const index = module.match( /\.js$/ ) ? path.join( __dirname, '../modules', module ) : path.join( __dirname, '../modules', module, 'index.js' );
 	try {
 		require( index );
 	} catch ( e ) {
-		console.log( `\x1b[31m[E] [Modules]\x1b[0m Can't load module ${ dir } from ${ index }`, e );
+		console.log( `\x1b[31m[E] [Modules]\x1b[0m Can't load module ${ module.replace( /\.js$/, '' ) } from ${ index }`, e );
 	}
 }
 
 module.exports = {
 	dcBot,
 	tgBot,
-	tgOnMessage,
 	ircBot,
 	mwbot,
 	DCREVCHN: config.DCREVCHN,

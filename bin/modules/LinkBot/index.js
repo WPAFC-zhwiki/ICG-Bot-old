@@ -1,4 +1,4 @@
-const { transport, tgOnMessage } = require( '../../util/init.js' ),
+const { transport } = require( '../../util/init.js' ),
 	{ dcBot, tgBot, ircBot } = require( '../../util/bots.js' ),
 	irccolor = require( 'irc-colors' ),
 	parser = require( './parselink' );
@@ -25,7 +25,7 @@ dcBot.on( 'message', function ( message ) {
 	} );
 } );
 
-tgOnMessage( function ( ctx ) {
+tgBot.on( 'message', function ( ctx, next ) {
 	if ( typeof ctx.message.text === 'string' || typeof ctx.message.caption === 'string' ) {
 		logs = {
 			client: 'Telegram',
@@ -40,6 +40,8 @@ tgOnMessage( function ( ctx ) {
 			ctx.reply( msg );
 		} );
 	}
+
+	return next();
 } );
 
 ircBot.on( 'message', function ( from, to, text ) {

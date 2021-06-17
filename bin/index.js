@@ -1,6 +1,6 @@
-const { dcBot, tgBot } = require( './util/bots' );
-const fs = require( 'fs' ),
-	{ DCREVCHN, TGREVGRP, bindCommand, bindEvent, loadModules } = require( './util/init.js' );
+const { dcBot, tgBot } = require( './util/bots' ),
+	{ bindCommand, bindEvent, loadModules } = require( './util/init.js' ),
+	fs = require( 'fs' );
 
 console.log( '\x1b[34m[BOT]\x1b[0m Loading commands:' );
 
@@ -21,6 +21,13 @@ for ( const file of commandFiles ) {
 
 tgBot.telegram.setMyCommands( commandList );
 
+const modulesDirs = fs
+	.readdirSync( './modules' );
+
+for ( const path of modulesDirs ) {
+	loadModules( path );
+}
+
 console.log( '\x1b[34m[BOT]\x1b[0m Loading events:' );
 
 const eventFiles = fs
@@ -31,32 +38,6 @@ for ( const file of eventFiles ) {
 	const event = require( `./events/${ file }` );
 	bindEvent( event );
 }
-
-const modulesDirs = fs
-	.readdirSync( './modules' );
-
-for ( const dir of modulesDirs ) {
-	loadModules( dir );
-}
-
-dcBot.once( 'ready', async () => {
-	tgBot.on( 'message', ( msg ) => {
-		let chatId = msg.chat.id;
-
-		if ( /ping/i.test( msg.text ) ) {
-			tgBot.telegram.sendMessage( chatId, 'Pong!' );
-		}
-		let fwdchan;
-		if ( msg.chat.id === TGREVGRP ) {
-			fwdchan = DCREVCHN;
-		}
-		if ( !fwdchan ) {
-			return;
-		}
-	} );
-
-	tgBot.on( 'polling_error', console.log );
-} );
 
 dcBot.once( 'ready', async () => {
 	dcBot.user.setPresence( {

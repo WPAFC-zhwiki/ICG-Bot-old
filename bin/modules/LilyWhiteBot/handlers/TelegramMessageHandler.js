@@ -19,7 +19,6 @@ class TelegramMessageHandler extends MessageHandler {
 			botConfig[ key ] = botConfig[ key ] || tgOptions[ key ];
 		}
 
-		const { tgOnMessage } = require( '../../../util/init.js' );
 		const client = require( '../../../util/bots' ).tgBot;
 
 		if ( botConfig.webhook && botConfig.webhook.port > 0 ) {
@@ -77,164 +76,167 @@ class TelegramMessageHandler extends MessageHandler {
 		this._startTime = new Date().getTime() / 1000;
 		this._keepSilence = tgOptions.keepSilence || [];
 
-		tgOnMessage( async ( ctx ) => {
-			if ( this._enabled && ctx.message && ctx.chat ) {
-				if ( ctx.message.date < this._startTime ) {
-					return;
-				}
-
-				const context = new Context( {
-					from: ctx.message.from.id,
-					to: ctx.chat.id,
-					nick: this._getNick( ctx.message.from ),
-					text: '',
-					isPrivate: ( ctx.chat.id > 0 ),
-					extra: {
-						username: ctx.message.from.username
-					},
-					handler: this,
-					_rawdata: ctx
-				} );
-
-				if ( ctx.message.reply_to_message ) {
-					let reply = ctx.message.reply_to_message;
-					let replyTo = this._getNick( reply.from );
-					let replyMessage = this._convertToText( reply );
-
-					context.extra.reply = {
-						nick: replyTo,
-						username: reply.from.username,
-						message: replyMessage,
-						isText: reply.text && true
-					};
-				} else if ( ctx.message.forward_from ) {
-					let fwd = ctx.message.forward_from;
-					let fwdFrom = this._getNick( fwd );
-
-					context.extra.forward = {
-						nick: fwdFrom,
-						username: fwd.username
-					};
-				}
-
-				if ( ctx.message.text ) {
-					if ( !context.text ) {
-						context.text = ctx.message.text;
+		client.on( 'message', ( ctx, next ) => {
+			( async function () {
+				if ( this._enabled && ctx.message && ctx.chat ) {
+					if ( ctx.message.date < this._startTime ) {
+						return;
 					}
 
-					// 解析命令
-					let [ , cmd, , param ] = ctx.message.text.match( /^\/([A-Za-z0-9_@]+)(\s+(.*)|\s*)$/u ) || [];
-					if ( cmd ) {
-						// 如果包含 Bot 名，判断是否为自己
-						let [ , c, , n ] = cmd.match( /^([A-Za-z0-9_]+)(|@([A-Za-z0-9_]+))$/u ) || [];
-						if ( ( n && ( n.toLowerCase() === this._username.toLowerCase() ) ) || !n ) {
-							param = param || '';
+					const context = new Context( {
+						from: ctx.message.from.id,
+						to: ctx.chat.id,
+						nick: this._getNick( ctx.message.from ),
+						text: '',
+						isPrivate: ( ctx.chat.id > 0 ),
+						extra: {
+							username: ctx.message.from.username
+						},
+						handler: this,
+						_rawdata: ctx
+					} );
 
-							context.command = c;
-							context.param = param;
+					if ( ctx.message.reply_to_message ) {
+						let reply = ctx.message.reply_to_message;
+						let replyTo = this._getNick( reply.from );
+						let replyMessage = this._convertToText( reply );
 
-							if ( typeof this._commands.get( c ) === 'function' ) {
-								this._commands.get( c )( context, c, param || '' );
-							}
+						context.extra.reply = {
+							nick: replyTo,
+							username: reply.from.username,
+							message: replyMessage,
+							isText: reply.text && true
+						};
+					} else if ( ctx.message.forward_from ) {
+						let fwd = ctx.message.forward_from;
+						let fwdFrom = this._getNick( fwd );
 
-							this.emit( 'command', context, c, param || '' );
-							this.emit( `command#${ c }`, context, param || '' );
+						context.extra.forward = {
+							nick: fwdFrom,
+							username: fwd.username
+						};
+					}
+
+					if ( ctx.message.text ) {
+						if ( !context.text ) {
+							context.text = ctx.message.text;
 						}
-					}
 
-					this.emit( 'text', context );
-				} else {
-					let message = ctx.message;
-					const setFile = async ( msg, type ) => {
-						context.extra.files = [ {
-							client: 'Telegram',
-							url: await this.getFileLink( msg.file_id ),
-							type: type,
-							id: msg.file_id,
-							size: msg.file_size,
-							mime_type: msg.mime_type
-						} ];
-					};
+						// 解析命令
+						let [ , cmd, , param ] = ctx.message.text.match( /^\/([A-Za-z0-9_@]+)(\s+(.*)|\s*)$/u ) || [];
+						if ( cmd ) {
+							// 如果包含 Bot 名，判断是否为自己
+							let [ , c, , n ] = cmd.match( /^([A-Za-z0-9_]+)(|@([A-Za-z0-9_]+))$/u ) || [];
+							if ( ( n && ( n.toLowerCase() === this._username.toLowerCase() ) ) || !n ) {
+								param = param || '';
 
-					if ( message.photo ) {
-						let sz = 0;
-						for ( let p of message.photo ) {
-							if ( p.file_size > sz ) {
-								await setFile( p, 'photo' );
-								context.text = `<photo: ${ p.width }x${ p.height }, ${ getFriendlySize( p.file_size ) }>`;
-								sz = p.file_size;
+								context.command = c;
+								context.param = param;
+
+								if ( typeof this._commands.get( c ) === 'function' ) {
+									this._commands.get( c )( context, c, param || '' );
+								}
+
+								this.emit( 'command', context, c, param || '' );
+								this.emit( `command#${ c }`, context, param || '' );
 							}
 						}
 
-						if ( message.caption ) {
-							context.text += ' ' + message.caption;
-						}
-						context.extra.isImage = true;
-						context.extra.imageCaption = message.caption;
-					} else if ( message.sticker ) {
-						context.text = `${ message.sticker.emoji }<Sticker>`;
-						await setFile( message.sticker, 'sticker' );
-						context.extra.isImage = true;
-					} else if ( message.audio ) {
-						context.text = `<Audio: ${ message.audio.duration }", ${ getFriendlySize( message.audio.file_size ) }>`;
-						await setFile( message.audio, 'audio' );
-					} else if ( message.voice ) {
-						context.text = `<Voice: ${ message.voice.duration }", ${ getFriendlySize( message.voice.file_size ) }>`;
-						await setFile( message.voice, 'voice' );
-					} else if ( message.video ) {
-						context.text = `<Video: ${ message.video.width }x${ message.video.height }, ${ message.video.duration }", ${ getFriendlySize( message.video.file_size ) }>`;
-						await setFile( message.video, 'video' );
-					} else if ( message.document ) {
-						context.text = `<File: ${ message.document.file_name }, ${ getFriendlySize( message.document.file_size ) }>`;
-						await setFile( message.document, 'document' );
-					} else if ( message.contact ) {
-						context.text = `<Contact: ${ message.contact.first_name }, ${ message.contact.phone_number }>`;
-					} else if ( message.location ) {
-						context.text = `<Location: ${ getFriendlyLocation( message.location.latitude, message.location.longitude ) }>`;
-					} else if ( message.venue ) {
-						context.text = `<Venue: ${ message.venue.title }, ${ message.venue.address }, ${ getFriendlyLocation(
-							message.venue.location.latitude, message.venue.location.longitude ) }>`;
-					} else if ( message.pinned_message ) {
-						if ( message.from.id === message.pinned_message.from.id ) {
-							this.emit( 'pin', {
-								from: {
-									id: message.from.id,
-									nick: this._getNick( message.from ),
-									username: message.from.username
-								},
-								to: ctx.chat.id,
-								text: this._convertToText( message.pinned_message )
+						this.emit( 'text', context );
+					} else {
+						let message = ctx.message;
+						const setFile = async ( msg, type ) => {
+							context.extra.files = [ {
+								client: 'Telegram',
+								url: await this.getFileLink( msg.file_id ),
+								type: type,
+								id: msg.file_id,
+								size: msg.file_size,
+								mime_type: msg.mime_type
+							} ];
+						};
+
+						if ( message.photo ) {
+							let sz = 0;
+							for ( let p of message.photo ) {
+								if ( p.file_size > sz ) {
+									await setFile( p, 'photo' );
+									context.text = `<photo: ${ p.width }x${ p.height }, ${ getFriendlySize( p.file_size ) }>`;
+									sz = p.file_size;
+								}
+							}
+
+							if ( message.caption ) {
+								context.text += ' ' + message.caption;
+							}
+							context.extra.isImage = true;
+							context.extra.imageCaption = message.caption;
+						} else if ( message.sticker ) {
+							context.text = `${ message.sticker.emoji }<Sticker>`;
+							await setFile( message.sticker, 'sticker' );
+							context.extra.isImage = true;
+						} else if ( message.audio ) {
+							context.text = `<Audio: ${ message.audio.duration }", ${ getFriendlySize( message.audio.file_size ) }>`;
+							await setFile( message.audio, 'audio' );
+						} else if ( message.voice ) {
+							context.text = `<Voice: ${ message.voice.duration }", ${ getFriendlySize( message.voice.file_size ) }>`;
+							await setFile( message.voice, 'voice' );
+						} else if ( message.video ) {
+							context.text = `<Video: ${ message.video.width }x${ message.video.height }, ${ message.video.duration }", ${ getFriendlySize( message.video.file_size ) }>`;
+							await setFile( message.video, 'video' );
+						} else if ( message.document ) {
+							context.text = `<File: ${ message.document.file_name }, ${ getFriendlySize( message.document.file_size ) }>`;
+							await setFile( message.document, 'document' );
+						} else if ( message.contact ) {
+							context.text = `<Contact: ${ message.contact.first_name }, ${ message.contact.phone_number }>`;
+						} else if ( message.location ) {
+							context.text = `<Location: ${ getFriendlyLocation( message.location.latitude, message.location.longitude ) }>`;
+						} else if ( message.venue ) {
+							context.text = `<Venue: ${ message.venue.title }, ${ message.venue.address }, ${ getFriendlyLocation(
+								message.venue.location.latitude, message.venue.location.longitude ) }>`;
+						} else if ( message.pinned_message ) {
+							if ( message.from.id === message.pinned_message.from.id ) {
+								this.emit( 'pin', {
+									from: {
+										id: message.from.id,
+										nick: this._getNick( message.from ),
+										username: message.from.username
+									},
+									to: ctx.chat.id,
+									text: this._convertToText( message.pinned_message )
+								}, ctx );
+							} else {
+								context.text = `<Pinned Message: ${ this._convertToText( message.pinned_message ) }>`;
+							}
+						} else if ( message.left_chat_member ) {
+							this.emit( 'leave', ctx.chat.id, {
+								id: message.from.id,
+								nick: this._getNick( message.from ),
+								username: message.from.username
+							}, {
+								id: message.left_chat_member.id,
+								nick: this._getNick( message.left_chat_member ),
+								username: message.left_chat_member.username
 							}, ctx );
-						} else {
-							context.text = `<Pinned Message: ${ this._convertToText( message.pinned_message ) }>`;
+						} else if ( message.new_chat_member ) {
+							this.emit( 'join', ctx.chat.id, {
+								id: message.from.id,
+								nick: this._getNick( message.from ),
+								username: message.from.username
+							}, {
+								id: message.new_chat_member.id,
+								nick: this._getNick( message.new_chat_member ),
+								username: message.new_chat_member.username
+							}, ctx );
 						}
-					} else if ( message.left_chat_member ) {
-						this.emit( 'leave', ctx.chat.id, {
-							id: message.from.id,
-							nick: this._getNick( message.from ),
-							username: message.from.username
-						}, {
-							id: message.left_chat_member.id,
-							nick: this._getNick( message.left_chat_member ),
-							username: message.left_chat_member.username
-						}, ctx );
-					} else if ( message.new_chat_member ) {
-						this.emit( 'join', ctx.chat.id, {
-							id: message.from.id,
-							nick: this._getNick( message.from ),
-							username: message.from.username
-						}, {
-							id: message.new_chat_member.id,
-							nick: this._getNick( message.new_chat_member ),
-							username: message.new_chat_member.username
-						}, ctx );
-					}
 
-					if ( context.text ) {
-						this.emit( 'richmessage', context );
+						if ( context.text ) {
+							this.emit( 'richmessage', context );
+						}
 					}
 				}
-			}
+			}() );
+			return next();
 		} );
 	}
 
