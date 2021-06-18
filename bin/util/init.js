@@ -44,6 +44,7 @@ dcBot.login( credentials.DiscordToken ).catch( function ( e ) {
 
 dcBot.once( 'ready', function () {
 	console.log( `\x1b[32m[INIT] [Discord]\x1b[0m login as ${ dcBot.user.username }#${ dcBot.user.tag } (${ dcBot.user.id })` );
+	console.log( '\x1b[32m[INIT] [Discord]\x1b[0m Start process......' );
 } );
 
 dcBot.on( 'error', function ( err ) {
@@ -53,7 +54,7 @@ dcBot.on( 'error', function ( err ) {
 tgBot.telegram.getMe().then( function ( me ) {
 	console.log( `\x1b[32m[INIT] [Telegram]\x1b[0m login as ${ me.first_name }${ me.last_name || '' }@${ me.username } (${ me.id })` );
 } ).catch( function ( e ) {
-	console.log( '\x1b[31m[INIT] [Telegram]\x1b[0m Telegraf.telegram.getMe() fail', e );
+	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m Telegraf.telegram.getMe() fail', e );
 	return null;
 } );
 
@@ -65,13 +66,16 @@ tgBot.catch( function ( err ) {
 	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m', err );
 } );
 
-function setWebhook( path ) {
-	return tgBot.webhookCallback( path );
-}
+tgBot.launch().then( function () {
+	console.log( '\x1b[32m[INIT] [Telegram]\x1b[0m Start process......' );
+} ).catch( function ( err ) {
+	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m', err );
+} );
 
 ircBot.connect();
 
-ircBot.on( 'registered', () => {
+ircBot.on( 'registered', function () {
+	console.log( '\x1b[32m[INIT] [IRC]\x1b[0m Start process......' );
 	ircBot.whois( credentials.IRC.nick, function ( data ) {
 		try {
 			console.log( `\x1b[32m[INIT] [IRC]\x1b[0m login as ${ data.nick }!${ data.user }@${ data.host } (${ data.account })` );
