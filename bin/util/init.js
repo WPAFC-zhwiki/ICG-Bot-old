@@ -264,7 +264,3 @@ module.exports = {
 	jQuery,
 	$: jQuery
 };
-
-const http = require( 'http' );
-
-http.createServer( require( '../../ICG-BOT/bin/util/init' ).setWebhook( '/webhook/ICG-BOT' ) ).listen( parseInt( process.env.PORT, 10 ) );
