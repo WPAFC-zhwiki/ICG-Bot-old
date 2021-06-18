@@ -1,11 +1,12 @@
 const { dcBot, tgBot } = require( './util/bots' ),
 	{ bindCommand, bindEvent, loadModules } = require( './util/init.js' ),
-	fs = require( 'fs' );
+	fs = require( 'fs' ),
+	path = require( 'path' );
 
 console.log( '\x1b[34m[BOT]\x1b[0m Loading commands:' );
 
 const commandFiles = fs
-	.readdirSync( './commands' )
+	.readdirSync( path.join( __dirname, 'commands' ) )
 	.filter( ( file ) => file.endsWith( '.js' ) );
 
 const commandList = [];
@@ -22,16 +23,16 @@ for ( const file of commandFiles ) {
 tgBot.telegram.setMyCommands( commandList );
 
 const modulesDirs = fs
-	.readdirSync( './modules' );
+	.readdirSync( path.join( __dirname, 'modules' ) );
 
-for ( const path of modulesDirs ) {
-	loadModules( path );
+for ( const module of modulesDirs ) {
+	loadModules( module );
 }
 
 console.log( '\x1b[34m[BOT]\x1b[0m Loading events:' );
 
 const eventFiles = fs
-	.readdirSync( './events' )
+	.readdirSync( path.join( __dirname, 'events' ) )
 	.filter( ( file ) => file.endsWith( '.js' ) );
 
 for ( const file of eventFiles ) {

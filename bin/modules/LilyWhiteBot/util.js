@@ -1,5 +1,6 @@
 const fs = require( 'fs' );
 const yaml = require( 'js-yaml' );
+const path = require( 'path' );
 
 // 用于加载配置文件
 const isFileExists = ( name ) => {
@@ -14,14 +15,14 @@ const isFileExists = ( name ) => {
 // 加载配置文件
 const loadConfig = ( name ) => {
 	// 优先读取yaml格式配置文件
-	if ( isFileExists( `modules/LilyWhiteBot/${ name }.yml` ) ) {
-		return yaml.safeLoad( fs.readFileSync( `modules/LilyWhiteBot/${ name }.yml`, 'utf8' ) );
-	} else if ( isFileExists( `modules/LilyWhiteBot/${ name }.yaml` ) ) {
-		return yaml.safeLoad( fs.readFileSync( `modules/LilyWhiteBot/${ name }.yaml`, 'utf8' ) );
-	} else if ( isFileExists( `modules/LilyWhiteBot/${ name }.js` ) ) {
+	if ( isFileExists( path.join( __dirname, `${ name }.yml` ) ) ) {
+		return yaml.safeLoad( fs.readFileSync( path.join( __dirname, `${ name }.yml` ), 'utf8' ) );
+	} else if ( isFileExists( path.join( __dirname, `${ name }.yaml` ) ) ) {
+		return yaml.safeLoad( fs.readFileSync( path.join( __dirname, `${ name }.yaml` ), 'utf8' ) );
+	} else if ( isFileExists( path.join( __dirname, `${ name }.js` ) ) ) {
 		console.warn( `* DEPRECATED: ${ name }.js format is deprecated, please use yaml format instead.` );
 		return require( `./${ name }.js` );
-	} else if ( isFileExists( `modules/LilyWhiteBot/${ name }.json` ) ) {
+	} else if ( isFileExists( path.join( __dirname, `${ name }.json` ) ) ) {
 		console.warn( `* DEPRECATED: ${ name }.json format is deprecated, please use yaml format instead.` );
 		return require( `./${ name }.json` );
 	} else {

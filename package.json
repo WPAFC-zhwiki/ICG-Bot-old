@@ -1,44 +1,48 @@
 {
-  "name": "zhwp-afc-icgbot",
-  "version": "0.1.0",
-  "description": "中文維基百科創建條目專題互聯群機械人",
-  "main": "index.js",
-  "dependencies": {
-    "cron": "^1.8.2",
-    "discord.js": "^12.5.3",
-    "eventsource": "^1.1.0",
-    "fs": "^0.0.1-security",
-    "irc-colors": "^1.5.0",
-    "irc-upd": "^0.11.0",
-    "jquery": "^3.6.0",
-    "js-yaml": "^3.14.1",
-    "jsdom": "^16.6.0",
-    "moment": "^2.29.1",
-    "mwn": "^0.11.0",
-    "request": "^2.88.2",
-    "sharp": "^0.28.3",
-    "string-format": "^2.0.0",
-    "supports-color": "^2.0.0",
-    "telegraf": "^4.3.0",
-    "tough-cookie": "^4.0.0"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.26.1",
-    "@typescript-eslint/parser": "^4.26.1",
-    "eslint": "^7.28.0",
-    "eslint-config-wikimedia": "^0.20.0"
-  },
-  "scripts": {
-    "test": "node index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/LuciferianThomas/zhwp-afc-icgbot.git"
-  },
-  "author": "LuciferianThomas",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/LuciferianThomas/zhwp-afc-icgbot/issues"
-  },
-  "homepage": "https://github.com/LuciferianThomas/zhwp-afc-icgbot#readme"
+	"name": "zhwp-afc-icgbot",
+	"version": "0.1.0",
+	"description": "中文維基百科創建條目專題互聯群機械人",
+	"main": "index.js",
+	"dependencies": {
+		"cron": "^1.8.2",
+		"discord.js": "^12.5.3",
+		"eventsource": "^1.1.0",
+		"fs": "^0.0.1-security",
+		"irc-colors": "^1.5.0",
+		"irc-upd": "^0.11.0",
+		"jquery": "^3.6.0",
+		"js-yaml": "^3.14.1",
+		"jsdom": "^16.6.0",
+		"moment": "^2.29.1",
+		"mwn": "^0.11.0",
+		"request": "^2.88.2",
+		"sharp": "^0.28.3",
+		"string-format": "^2.0.0",
+		"supports-color": "^2.0.0",
+		"telegraf": "^4.3.0",
+		"tough-cookie": "^4.0.0"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^4.26.1",
+		"@typescript-eslint/parser": "^4.26.1",
+		"eslint": "^7.28.0",
+		"eslint-config-wikimedia": "^0.20.0"
+	},
+	"private": true,
+	"scripts": {
+		"start": "node bin/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WPAFC-zhwiki/ICG-Bot.git"
+	},
+	"author": {
+		"name": "Project AFC at chinese wikipedia and other contributors",
+		"url": "https://github.com/WPAFC-zhwiki/ICG-Bot/blob/rebuild/AUTHORS.txt"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/WPAFC-zhwiki/ICG-Bot/issues"
+	},
+	"homepage": "https://github.com/WPAFC-zhwiki/ICG-Bot#readme"
 }

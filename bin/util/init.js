@@ -65,9 +65,9 @@ tgBot.catch( function ( err ) {
 	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m', err );
 } );
 
-tgBot.launch().catch( function ( e ) {
-	console.log( '\x1b[31m[ERR] [Telegram]\x1b[0m Error:', e );
-} );
+function setWebhook( path ) {
+	return tgBot.webhookCallback( path );
+}
 
 ircBot.connect();
 
@@ -252,6 +252,7 @@ module.exports = {
 	dcBot,
 	tgBot,
 	ircBot,
+	setWebhook,
 	mwbot,
 	DCREVCHN: config.DCREVCHN,
 	TGREVGRP: config.TGREVGRP,
@@ -263,3 +264,7 @@ module.exports = {
 	jQuery,
 	$: jQuery
 };
+
+const http = require( 'http' );
+
+http.createServer( require( '../../ICG-BOT/bin/util/init' ).setWebhook( '/webhook/ICG-BOT' ) ).listen( parseInt( process.env.PORT, 10 ) );

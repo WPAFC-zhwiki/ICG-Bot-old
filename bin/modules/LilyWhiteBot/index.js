@@ -11,7 +11,6 @@ const { loadConfig } = require( './util.js' );
 const allHandlers = new Map( [
 	[ 'IRC', 'IRCMessageHandler' ],
 	[ 'Telegram', 'TelegramMessageHandler' ],
-	[ 'QQ', 'QQSocketApiMessageHandler' ],
 	[ 'Discord', 'DiscordMessageHandler' ]
 ] );
 
@@ -50,6 +49,7 @@ for ( let type of allHandlers.keys() ) {
 		enabledClients.push( type );
 	}
 }
+
 console.log( `\x1b[36m[Modules] [LilyWhiteBot]\x1b[0m Enabled clients: ${ enabledClients.join( ', ' ) }` );
 
 for ( let client of enabledClients ) {
