@@ -256,7 +256,6 @@ module.exports = {
 	dcBot,
 	tgBot,
 	ircBot,
-	setWebhook,
 	mwbot,
 	DCREVCHN: config.DCREVCHN,
 	TGREVGRP: config.TGREVGRP,
